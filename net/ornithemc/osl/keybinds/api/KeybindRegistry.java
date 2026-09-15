@@ -1,0 +1,36 @@
+package net.ornithemc.osl.keybinds.api;
+
+import java.util.Set;
+import net.minecraft.unmapped.C_23708450;
+import net.ornithemc.osl.keybinds.impl.KeybindRegistryImpl;
+
+/**
+ * Public access to the Keybinds registry.
+ */
+public final class KeybindRegistry {
+
+	/**
+	 * @return the set of all keybind categories.
+	 */
+	public static Set<String> getCategories() {
+		return KeybindRegistryImpl.getCategories();
+	}
+
+	/**
+	 * @param name		   the name or translation key of the keybind.
+	 * @param defaultKeyCode the default key code of the keybind.
+	 * @param category	   the name or translation key of the category to which the keybind belongs.
+	 * @return the registered keybind.
+	 */
+	public static C_23708450 register(String name, int defaultKeyCode, String category) {
+		return KeybindRegistryImpl.register(name, defaultKeyCode, category);
+	}
+
+	/**
+	 * @param keybind the keybind to register.
+	 * @return the registered keybind.
+	 */
+	public static C_23708450 register(C_23708450 keybind) {
+		return KeybindRegistryImpl.register(keybind);
+	}
+}

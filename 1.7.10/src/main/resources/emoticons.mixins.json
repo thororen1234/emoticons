@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "mchorse.emoticons.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "PlayerRendererMixin",
+    "SkinImageProcessorMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
