@@ -7,17 +7,11 @@ import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resource.Resource;
 import net.minecraft.client.resource.manager.ResourceManager;
-import net.minecraft.client.resource.SimpleResource;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.resource.Identifier;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -28,23 +22,11 @@ public class RLUtils {
 		}
 		try {
 			final ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-			final java.awt.image.BufferedImage read = null;
-			final Graphics graphics = read.getGraphics();
-			for (int i = 1; i < multi.children.size(); ++i) {
-				final Identifier location = multi.children.get(i);
-				try {
-					
-				} catch (final Exception ex) {
-				}
-			}
-			graphics.dispose();
-			final ByteArrayOutputStream output = new ByteArrayOutputStream();
-			ImageIO.write(read, "png", output);
-			return new SimpleResource("McLib multiskin handler", multi, new ByteArrayInputStream(output.toByteArray()), null, null);
-		} catch (final IOException ex2) {
-			throw ex2;
-		} catch (final Exception ex3) {
-			throw new IOException(ex3.getMessage());
+			return resourceManager.getResource(multi.children.get(0));
+		} catch (final IOException ex) {
+			throw ex;
+		} catch (final Exception ex) {
+			throw new IOException(ex.getMessage());
 		}
 	}
 
@@ -102,7 +84,7 @@ public class RLUtils {
 		if (location instanceof MultiResourceLocation) {
 			final MultiResourceLocation multi = (MultiResourceLocation) location;
 			final NbtList tagList = new NbtList();
-			final Iterator iterator = multi.children.iterator();
+			final Iterator<?> iterator = multi.children.iterator();
 			while (iterator.hasNext()) {
 				tagList.addElement(new NbtString(((Identifier) iterator.next()).toString()));
 			}
@@ -118,7 +100,7 @@ public class RLUtils {
 		if (location instanceof MultiResourceLocation) {
 			final MultiResourceLocation multi = (MultiResourceLocation) location;
 			final JsonArray jsonArray = new JsonArray();
-			final Iterator iterator = multi.children.iterator();
+			final Iterator<?> iterator = multi.children.iterator();
 			while (iterator.hasNext()) {
 				jsonArray.add(new JsonPrimitive(((Identifier) iterator.next()).toString()));
 			}
@@ -165,4 +147,3 @@ public class RLUtils {
 		return location.toString();
 	}
 }
-

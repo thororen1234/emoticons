@@ -1,5 +1,4 @@
 package mchorse.emoticons.api.animation.model;
-import net.minecraft.item.ArmorItem;
 
 import com.google.common.collect.Maps;
 import mchorse.emoticons.skin_n_bones.api.animation.AnimationMesh;
@@ -7,7 +6,6 @@ import mchorse.emoticons.skin_n_bones.api.animation.AnimationMeshConfig;
 import mchorse.emoticons.skin_n_bones.api.animation.model.AnimatorController;
 import mchorse.emoticons.skin_n_bones.api.animation.model.AnimatorHeldItemConfig;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
-import net.minecraft.client.render.model.block.ModelTransformation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.living.LivingEntity;
 import net.minecraft.item.ArmorItem;

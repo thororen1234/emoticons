@@ -1,5 +1,7 @@
 package mchorse.emoticons.client;
 
+import mchorse.emoticons.client.gui.GuiEmotes;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,7 +86,7 @@ public class KeyboardHandler {
 	private static void processKeybind(PlayerEntity player, ICosmetic cap) {
 		Emote emote = cap.getEmote();
 		String key = null;
-		mchorse.emoticons.client.EmoteKeys emotesObj = ClientProxy.keys;
+		EmoteKeys emotesObj = ClientProxy.keys;
 
 		if (random.consumeClick()) {
 			List<String> keys = new ArrayList<>();
@@ -95,12 +97,18 @@ public class KeyboardHandler {
 		}
 
 		if (emotesObj != null && emotesObj.emotes.size() >= 6) {
-			if (emote1.consumeClick()) key = emotesObj.emotes.get(0);
-			if (emote2.consumeClick()) key = emotesObj.emotes.get(1);
-			if (emote3.consumeClick()) key = emotesObj.emotes.get(2);
-			if (emote4.consumeClick()) key = emotesObj.emotes.get(3);
-			if (emote5.consumeClick()) key = emotesObj.emotes.get(4);
-			if (emote6.consumeClick()) key = emotesObj.emotes.get(5);
+			if (emote1.consumeClick())
+				key = emotesObj.emotes.get(0);
+			if (emote2.consumeClick())
+				key = emotesObj.emotes.get(1);
+			if (emote3.consumeClick())
+				key = emotesObj.emotes.get(2);
+			if (emote4.consumeClick())
+				key = emotesObj.emotes.get(3);
+			if (emote5.consumeClick())
+				key = emotesObj.emotes.get(4);
+			if (emote6.consumeClick())
+				key = emotesObj.emotes.get(5);
 		}
 
 		double dist = Math.abs(player.velocityX) + Math.abs(player.velocityZ);
@@ -117,7 +125,7 @@ public class KeyboardHandler {
 			Minecraft mc = Minecraft.getInstance();
 			if (mc.screen == null) {
 				try {
-					mc.openScreen(new mchorse.emoticons.client.gui.GuiEmotes());
+					mc.openScreen(new GuiEmotes());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

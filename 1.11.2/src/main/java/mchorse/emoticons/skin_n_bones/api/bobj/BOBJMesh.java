@@ -6,12 +6,12 @@ import java.util.List;
 
 public class BOBJMesh {
 	public String name;
-	public List faces;
+public List<Face> faces;
 	public String armatureName;
 	public BOBJArmature armature;
 
 	public BOBJMesh(final String name) {
-		this.faces = new ArrayList();
+		this.faces = new ArrayList<>();
 		this.name = name;
 	}
 
@@ -19,7 +19,7 @@ public class BOBJMesh {
 		final BOBJMesh BOBJMesh = new BOBJMesh(this.name);
 		BOBJMesh.armatureName = this.armatureName;
 		BOBJMesh.armature = this.armature;
-		final Iterator iterator = this.faces.iterator();
+		final Iterator<?> iterator = this.faces.iterator();
 		while (iterator.hasNext()) {
 			BOBJMesh.faces.add(((Face) iterator.next()).add(n, n2, n3));
 		}

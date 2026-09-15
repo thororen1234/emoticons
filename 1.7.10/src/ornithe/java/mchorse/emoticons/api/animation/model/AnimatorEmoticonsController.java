@@ -1,5 +1,4 @@
 package mchorse.emoticons.api.animation.model;
-import net.minecraft.item.ArmorItem;
 
 import com.google.common.collect.Maps;
 import mchorse.emoticons.skin_n_bones.api.animation.AnimationMesh;
@@ -130,4 +129,3 @@ public class AnimatorEmoticonsController extends AnimatorController {
 		return slot == SLOT_LEGS;
 	}
 }
-

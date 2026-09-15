@@ -14,9 +14,9 @@ public class BOBJArmature {
 
 	public BOBJArmature(final String name) {
 		this.action = "";
-		this.bones = new HashMap();
-		this.orderedBones = new ArrayList();
-		this.ikBones = new ArrayList();
+		this.bones = new HashMap<>();
+		this.orderedBones = new ArrayList<>();
+		this.ikBones = new ArrayList<>();
 		this.name = name;
 	}
 

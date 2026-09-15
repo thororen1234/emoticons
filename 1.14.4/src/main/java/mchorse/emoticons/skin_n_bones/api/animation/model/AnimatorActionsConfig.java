@@ -10,7 +10,7 @@ public class AnimatorActionsConfig {
 	public Map<Object, ActionConfig> actions;
 
 	public AnimatorActionsConfig() {
-		this.actions = new HashMap();
+		this.actions = new HashMap<>();
 	}
 
 	public void copy(final AnimatorActionsConfig config) {

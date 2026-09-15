@@ -1,3 +1,4 @@
+* text=auto eol=lf
 *.bobj binary
 *.obj binary
 *.mtl binary

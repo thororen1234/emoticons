@@ -1,7 +1,5 @@
 package mchorse.mclib.client.render;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.model.Model;
 import net.minecraft.entity.living.LivingEntity;

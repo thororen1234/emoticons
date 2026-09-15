@@ -7,18 +7,11 @@ import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.manager.ResourceManager;
-import net.minecraft.client.resource.metadata.serializer.ResourceMetadataSerializer;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.resource.Identifier;
-import java.io.InputStream;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -27,39 +20,8 @@ public class RLUtils {
 		if (multi.children.isEmpty()) {
 			throw new IOException("Multi-skin is empty!");
 		}
-		try {
-			final ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-			final java.awt.image.BufferedImage read = null;
-			final Graphics graphics = read.getGraphics();
-			for (int i = 1; i < multi.children.size(); ++i) {
-				final Identifier location = multi.children.get(i);
-				try {
-					
-				} catch (final Exception ex) {
-				}
-			}
-			graphics.dispose();
-			final ByteArrayOutputStream output = new ByteArrayOutputStream();
-			ImageIO.write(read, "png", output);
-			return new Resource() {
-				@Override
-				public void close() throws IOException {}
-				@Override
-				public Identifier getLocation() { return multi; }
-				@Override
-				public InputStream asStream() { return new ByteArrayInputStream(output.toByteArray()); }
-				@Override
-				public boolean hasMetadata() { return false; }
-				@Override
-				public <T> T getMetadata(ResourceMetadataSerializer<T> reader) { return null; }
-				@Override
-				public String getSourceName() { return "McLib multiskin handler"; }
-			};
-		} catch (final IOException ex2) {
-			throw ex2;
-		} catch (final Exception ex3) {
-			throw new IOException(ex3.getMessage());
-		}
+		final ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+		return resourceManager.getResource(multi.children.get(0));
 	}
 
 	public static Identifier create(String string) {
@@ -76,9 +38,9 @@ public class RLUtils {
 		return new Identifier(s, s2);
 	}
 
-	public static Identifier create(final NbtElement NbtElement) {
-		if (NbtElement instanceof NbtList) {
-			final NbtList tagList = (NbtList) NbtElement;
+	public static Identifier create(final NbtElement element) {
+		if (element instanceof NbtList) {
+			final NbtList tagList = (NbtList) element;
 			if (!tagList.isEmpty()) {
 				final MultiResourceLocation multi = new MultiResourceLocation(tagList.getString(0));
 				for (int i = 1; i < tagList.size(); ++i) {
@@ -86,8 +48,8 @@ public class RLUtils {
 				}
 				return multi;
 			}
-		} else if (NbtElement instanceof NbtString) {
-			return create(((NbtString) NbtElement).asString());
+		} else if (element instanceof NbtString) {
+			return create(((NbtString) element).asString());
 		}
 		return null;
 	}
@@ -116,7 +78,7 @@ public class RLUtils {
 		if (location instanceof MultiResourceLocation) {
 			final MultiResourceLocation multi = (MultiResourceLocation) location;
 			final NbtList tagList = new NbtList();
-			final Iterator iterator = multi.children.iterator();
+			final Iterator<?> iterator = multi.children.iterator();
 			while (iterator.hasNext()) {
 				tagList.add(new NbtString(((Identifier) iterator.next()).toString()));
 			}
@@ -132,7 +94,7 @@ public class RLUtils {
 		if (location instanceof MultiResourceLocation) {
 			final MultiResourceLocation multi = (MultiResourceLocation) location;
 			final JsonArray jsonArray = new JsonArray();
-			final Iterator iterator = multi.children.iterator();
+			final Iterator<?> iterator = multi.children.iterator();
 			while (iterator.hasNext()) {
 				jsonArray.add(new JsonPrimitive(((Identifier) iterator.next()).toString()));
 			}
@@ -179,4 +141,3 @@ public class RLUtils {
 		return location.toString();
 	}
 }
-

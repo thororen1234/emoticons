@@ -2,7 +2,6 @@ package mchorse.emoticons.skin_n_bones.api.animation.model;
 
 import mchorse.emoticons.skin_n_bones.api.animation.Animation;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.living.LivingEntity;
 import net.minecraft.entity.living.player.PlayerEntity;
 
@@ -47,7 +46,7 @@ public class Animator implements IAnimator {
 	public AnimatorController controller;
 
 	public Animator(final AnimatorController controller) {
-		this.actions = new ArrayList();
+		this.actions = new ArrayList<>();
 		// 0;
 		// 0;
 		this.wasOnGround = true;

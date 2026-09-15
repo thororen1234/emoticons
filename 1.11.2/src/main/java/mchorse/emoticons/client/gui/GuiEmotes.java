@@ -1,5 +1,8 @@
 package mchorse.emoticons.client.gui;
 
+import mchorse.emoticons.common.EmoteAPI;
+import mchorse.emoticons.skin_n_bones.api.animation.model.ActionConfig;
+
 import mchorse.emoticons.ClientProxy;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.capabilities.cosmetic.EmoteController;
@@ -13,7 +16,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.entity.living.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -105,10 +107,10 @@ public class GuiEmotes extends Screen {
 	protected void buttonClicked(ButtonWidget button) {
 		int id = button.id;
 		if (id == 10 && selectedIndex >= 0 && selectedIndex < filteredKeys.size()) {
-			mchorse.emoticons.common.EmoteAPI.setEmoteClient(filteredKeys.get(selectedIndex), minecraft.player);
+			EmoteAPI.setEmoteClient(filteredKeys.get(selectedIndex), minecraft.player);
 			minecraft.openScreen(null);
 		}
-		if (id == 11) mchorse.emoticons.common.EmoteAPI.setEmoteClient("", minecraft.player);
+		if (id == 11) EmoteAPI.setEmoteClient("", minecraft.player);
 		if (id >= 0 && id < 6) {
 			this.slotIndex = id;
 			playPreview(this.keys.emotes.get(slotIndex));
@@ -305,7 +307,7 @@ public class GuiEmotes extends Screen {
 	private void playPreview(String key) {
 		if (this.controller == null || this.controller.animation == null || this.controller.config == null) return;
 		try {
-			mchorse.emoticons.skin_n_bones.api.animation.model.ActionConfig actionConfig = this.controller.config.config.actions.getConfig("emote_" + key);
+			ActionConfig actionConfig = this.controller.config.config.actions.getConfig("emote_" + key);
 			if (actionConfig != null) {
 				this.controller.setEmote(this.controller.animation.createAction(null, actionConfig, true));
 			}

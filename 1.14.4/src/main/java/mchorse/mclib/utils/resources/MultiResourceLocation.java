@@ -8,7 +8,7 @@ import java.util.List;
 
 public class MultiResourceLocation
 		extends Identifier {
-	public List<Identifier> children = new ArrayList();
+	public List<Identifier> children = new ArrayList<>();
 
 	public MultiResourceLocation(String string) {
 		super("it_would_be_very_ironic:if_this_would_match_with_regular_rls");

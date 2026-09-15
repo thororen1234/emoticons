@@ -1,0 +1,13 @@
+subprojects {
+	plugins.withId('java') {
+		java {
+			toolchain {
+				languageVersion = JavaLanguageVersion.of(8)
+			}
+		}
+	}
+}
+
+tasks.register('buildAll') {
+	dependsOn subprojects.collect { "${it.path}:build" }
+}

@@ -1,5 +1,7 @@
 package mchorse.emoticons.capabilities.cosmetic;
 
+import mchorse.emoticons.network.ClientEmoteNetwork;
+
 import mchorse.emoticons.ClientConfig;
 import mchorse.emoticons.Emoticons;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
@@ -136,7 +138,7 @@ public class EmoteController implements ICosmetic {
 				boolean local = entity == Minecraft.getInstance().player;
 				stop();
 				if (local)
-					mchorse.emoticons.network.ClientEmoteNetwork.send("");
+					ClientEmoteNetwork.send("");
 			} else {
 				emoteTimer++;
 			}

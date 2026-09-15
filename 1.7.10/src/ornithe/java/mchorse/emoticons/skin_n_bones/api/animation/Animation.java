@@ -24,7 +24,7 @@ public class Animation {
 		this.name = name;
 		this.data = data;
 		this.mc = Minecraft.getInstance();
-		this.meshes = new ArrayList();
+		this.meshes = new ArrayList<>();
 	}
 
 	public void reload(final BOBJData data) {
@@ -68,7 +68,7 @@ public class Animation {
 		this.meshes.clear();
 	}
 
-	public void render(final Map map) {
+	public void render(final Map<?, ?> map) {
 		for (final AnimationMesh AnimationMesh : this.meshes) {
 			AnimationMesh.render(this.mc, (map == null) ? null : ((AnimationMeshConfig) map.get(AnimationMesh.name)));
 		}

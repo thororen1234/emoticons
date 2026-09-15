@@ -18,7 +18,7 @@ public class BOBJLoader {
 		to.vertices.addAll(from.vertices);
 		to.normal.addAll(from.normal);
 		to.textures.addAll(from.textures);
-		final Iterator iterator = from.meshes.iterator();
+		final Iterator<?> iterator = from.meshes.iterator();
 		while (iterator.hasNext()) {
 			final BOBJMesh newMesh = ((BOBJMesh) iterator.next()).add(size, size2, size3);
 			newMesh.armature = (BOBJArmature) to.armatures.get(newMesh.armatureName);
@@ -59,7 +59,7 @@ public class BOBJLoader {
 		BOBJBone bone = null;
 		Vertex vertex = null;
 		int n = 0;
-		final Iterator iterator = lines.iterator();
+		final Iterator<?> iterator = lines.iterator();
 		while (iterator.hasNext()) {
 			final String[] split = ((String) iterator.next()).split("\\s");
 			final String s = split[0];
@@ -132,7 +132,7 @@ public class BOBJLoader {
 	public static Map<String, CompiledData> loadMeshes(final BOBJData data) {
 		final Map<String, CompiledData> hashMap = new HashMap<>();
 		for (final BOBJMesh BOBJMesh : data.meshes) {
-			final List<Integer> indices = new ArrayList();
+			final List<Integer> indices = new ArrayList<>();
 			final List<Face> faces = BOBJMesh.faces;
 			final int[] a = new int[faces.size() * 3 * 4];
 			final float[] a2 = new float[faces.size() * 3 * 4];
@@ -155,8 +155,8 @@ public class BOBJLoader {
 	}
 
 	public static CompiledData loadMesh(final BOBJData data) {
-		final List<Integer> indices = new ArrayList();
-		final List<Face> faces = new ArrayList();
+		final List<Integer> indices = new ArrayList<>();
+		final List<Face> faces = new ArrayList<>();
 		for (BOBJMesh bobjMesh : data.meshes) {
 			faces.addAll(bobjMesh.faces);
 		}

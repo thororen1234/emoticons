@@ -5,7 +5,6 @@ import javax.vecmath.Vector4f;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJBone;
-import net.minecraft.client.Minecraft;
 
 import net.minecraft.entity.living.LivingEntity;
 

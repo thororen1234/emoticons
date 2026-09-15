@@ -31,14 +31,15 @@ public class ClientProxy {
 			saved = EmoteKeys.fromFile(new File(net.minecraft.client.Minecraft.getInstance().gameDir,
 					"cheatbreaker/emoticons/keys.json"));
 		}
-		if (saved != null) keys = saved;
+		if (saved != null)
+			keys = saved;
 		EmoteKeys.toFile(keys, new File(configFolder, "keys.json"));
 		ClientConfig.load();
 		RenderLightmap.create();
 		reloadActions();
 		AnimationManager manager = AnimationManager.INSTANCE;
-		for (String model : new String[]{"default", "slim", "default_3d", "slim_3d",
-				"default_simple", "slim_simple", "default_simple_plus", "slim_simple_plus"}) {
+		for (String model : new String[] { "default", "slim", "default_3d", "slim_3d",
+				"default_simple", "slim_simple", "default_simple_plus", "slim_simple_plus" }) {
 			try {
 				BOBJData data = readModel(model);
 				BOBJLoader.merge(data, readModel(model.contains("simple") ? "props_simple" : "props"));
@@ -48,7 +49,8 @@ public class ClientProxy {
 				manager.animations.put(model, new AnimationEntry(animation, configFolder, 1L));
 				String config = model.replace("_3d", "").replace("_plus", "");
 				try (Reader reader = new InputStreamReader(requireResource(config + ".json"), StandardCharsets.UTF_8)) {
-					manager.configs.put(model, new AnimatorConfigEntry(manager.gson.fromJson(reader, AnimatorConfig.class), 1L));
+					manager.configs.put(model,
+							new AnimatorConfigEntry(manager.gson.fromJson(reader, AnimatorConfig.class), 1L));
 				}
 			} catch (Exception e) {
 				throw new IllegalStateException("Unable to load Emoticons model " + model, e);
@@ -58,7 +60,8 @@ public class ClientProxy {
 
 	private static InputStream requireResource(String name) throws IOException {
 		InputStream stream = ClientProxy.class.getResourceAsStream("/assets/emoticons/models/entity/" + name);
-		if (stream == null) throw new FileNotFoundException(name);
+		if (stream == null)
+			throw new FileNotFoundException(name);
 		return stream;
 	}
 
@@ -87,17 +90,22 @@ public class ClientProxy {
 						BOBJData data = BOBJLoader.readData(stream);
 						loaded.putAll(data.actions);
 						File metadata = new File(folder, file.getName().replaceFirst("\\.bobj$", ".json"));
-						if (!metadata.isFile()) continue;
-						try (Reader reader = new InputStreamReader(new FileInputStream(metadata), StandardCharsets.UTF_8)) {
-							JsonObject json = new JsonParser().parse(reader).getAsJsonObject();
+						if (!metadata.isFile())
+							continue;
+						try (Reader reader = new InputStreamReader(new FileInputStream(metadata),
+								StandardCharsets.UTF_8)) {
+							JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
 							for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
 								BOBJAction action = data.actions.get("emote_" + entry.getKey());
-								if (action == null || !entry.getValue().isJsonObject()) continue;
+								if (action == null || !entry.getValue().isJsonObject())
+									continue;
 								JsonObject info = entry.getValue().getAsJsonObject();
 								Emote emote = new Emote(entry.getKey(), action.getDuration(),
 										info.has("looping") && info.get("looping").getAsBoolean());
-								if (info.has("title")) emote.customTitle = info.get("title").getAsString();
-								if (info.has("description")) emote.customDescription = info.get("description").getAsString();
+								if (info.has("title"))
+									emote.customTitle = info.get("title").getAsString();
+								if (info.has("description"))
+									emote.customDescription = info.get("description").getAsString();
 								Emotes.register(emote);
 							}
 						}

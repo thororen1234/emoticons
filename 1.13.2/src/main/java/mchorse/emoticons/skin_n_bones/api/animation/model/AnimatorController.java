@@ -1,7 +1,5 @@
 package mchorse.emoticons.skin_n_bones.api.animation.model;
 
-import net.minecraft.item.ArmorItem;
-
 import mchorse.emoticons.skin_n_bones.api.animation.Animation;
 import mchorse.emoticons.skin_n_bones.api.animation.AnimationManager;
 import mchorse.emoticons.skin_n_bones.api.animation.AnimationMesh;
@@ -16,8 +14,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.living.LivingEntity;
 import net.minecraft.entity.vehicle.MinecartEntity;
 import net.minecraft.entity.living.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ArmorItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import org.lwjgl.BufferUtils;

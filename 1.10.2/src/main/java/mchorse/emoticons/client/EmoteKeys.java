@@ -1,5 +1,7 @@
 package mchorse.emoticons.client;
 
+import mchorse.emoticons.Emoticons;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -41,7 +43,7 @@ public class EmoteKeys {
 		try {
 			FileUtils.write(file, gson.toJson(keys), Charset.defaultCharset());
 		}
-		catch (IOException e) { mchorse.emoticons.Emoticons.LOGGER.warn("Unable to save emote slots", e); }
+		catch (IOException e) { Emoticons.LOGGER.warn("Unable to save emote slots", e); }
 	}
 
 	public static class EmoteKeysAdapter implements JsonDeserializer<EmoteKeys>, JsonSerializer<EmoteKeys> {

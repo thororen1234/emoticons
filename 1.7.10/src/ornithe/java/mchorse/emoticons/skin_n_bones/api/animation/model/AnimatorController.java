@@ -6,7 +6,6 @@ import mchorse.emoticons.skin_n_bones.api.animation.AnimationMesh;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJBone;
 import mchorse.mclib.client.render.RenderLightmap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.platform.Lighting;
 
 import net.minecraft.entity.Entity;
@@ -14,8 +13,8 @@ import net.minecraft.entity.living.LivingEntity;
 import net.minecraft.entity.vehicle.MinecartEntity;
 import net.minecraft.entity.living.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.nbt.NbtCompound;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -41,7 +40,6 @@ public class AnimatorController {
 	public int checkConfig;
 	public String animationName;
 	public NbtCompound userData;
-	private final Minecraft mc;
 	private final Vector4f result;
 	private final Matrix4f rotate;
 
@@ -51,7 +49,6 @@ public class AnimatorController {
 		this.result = new Vector4f();
 		this.rotate = new Matrix4f();
 		this.refresh(name, data);
-		this.mc = Minecraft.getInstance();
 	}
 
 	public Vector4f calcPosition(LivingEntity livingBase, BOBJBone bone, float x, float y, float z,
@@ -241,7 +238,8 @@ public class AnimatorController {
 				GL11.glTranslatef(0.0f, 0.25f, 0.0f);
 				GL11.glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
 				GL11.glScalef(0.625f, 0.625f, 0.625f);
-				net.minecraft.client.render.entity.EntityRenderDispatcher.INSTANCE.itemInHandRenderer.render(entity, stack, 0);
+				net.minecraft.client.render.entity.EntityRenderDispatcher.INSTANCE.itemInHandRenderer.render(entity,
+						stack, 0);
 				GL11.glPopMatrix();
 			}
 		}
@@ -275,7 +273,8 @@ public class AnimatorController {
 			GL11.glRotatef(config.rotateX, 1, 0, 0);
 			GL11.glRotatef(config.rotateY, 0, 1, 0);
 			GL11.glRotatef(config.rotateZ, 0, 0, 1);
-			net.minecraft.client.render.entity.EntityRenderDispatcher.INSTANCE.itemInHandRenderer.render(livingBase, stack, 0);
+			net.minecraft.client.render.entity.EntityRenderDispatcher.INSTANCE.itemInHandRenderer.render(livingBase,
+					stack, 0);
 		} finally {
 			GL11.glPopMatrix();
 		}

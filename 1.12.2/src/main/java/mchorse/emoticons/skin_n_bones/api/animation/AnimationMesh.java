@@ -156,8 +156,6 @@ public class AnimationMesh {
 		final boolean b = AnimationMeshConfig != null && AnimationMeshConfig.smooth;
 		final boolean b2 = AnimationMeshConfig != null && AnimationMeshConfig.normals;
 		final boolean b3 = AnimationMeshConfig == null || AnimationMeshConfig.lighting;
-		final float prevLightmapS = 0;
-		final float prevLightmapT = 0;
 		if (texture != null) {
 			GlStateManager.enableTexture();
 			minecraft.getTextureManager().bind(texture);

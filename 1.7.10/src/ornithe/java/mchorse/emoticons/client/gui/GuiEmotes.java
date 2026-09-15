@@ -1,5 +1,8 @@
 package mchorse.emoticons.client.gui;
 
+import mchorse.emoticons.common.EmoteAPI;
+import mchorse.emoticons.skin_n_bones.api.animation.model.ActionConfig;
+
 import org.lwjgl.opengl.GL11;
 import mchorse.emoticons.ClientProxy;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
@@ -14,7 +17,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 
 import net.minecraft.entity.living.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -60,15 +62,14 @@ public class GuiEmotes extends Screen {
 		if (ec.controller != null) {
 			this.controller = new AnimatorEmoticonsController(
 					ec.controller.animationName,
-					ec.controller.userData
-			);
+					ec.controller.userData);
 			this.controller.fetchAnimation();
 			// fetchAnimation makes an independent copy for the preview.
 
 			// Apply actual player skin to preview
 			if (player instanceof net.minecraft.client.entity.living.player.ClientPlayerEntity) {
-				net.minecraft.client.resource.Identifier skinTex =
-						((net.minecraft.client.entity.living.player.ClientPlayerEntity) player).getSkinTextureLocation();
+				net.minecraft.client.resource.Identifier skinTex = ((net.minecraft.client.entity.living.player.ClientPlayerEntity) player)
+						.getSkinTextureLocation();
 				if (this.controller.userConfig != null && this.controller.userConfig.meshes.containsKey("body")) {
 					this.controller.userConfig.meshes.get("body").texture = EmoteController.getFixedSkin(skinTex);
 				}
@@ -83,6 +84,7 @@ public class GuiEmotes extends Screen {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void init() {
 		this.slotButtons.clear();
 		this.buttons.clear();
@@ -106,10 +108,11 @@ public class GuiEmotes extends Screen {
 	protected void buttonClicked(ButtonWidget button) {
 		int id = button.id;
 		if (id == 10 && selectedIndex >= 0 && selectedIndex < filteredKeys.size()) {
-			mchorse.emoticons.common.EmoteAPI.setEmoteClient(filteredKeys.get(selectedIndex), minecraft.player);
+			EmoteAPI.setEmoteClient(filteredKeys.get(selectedIndex), minecraft.player);
 			minecraft.openScreen(null);
 		}
-		if (id == 11) mchorse.emoticons.common.EmoteAPI.setEmoteClient("", minecraft.player);
+		if (id == 11)
+			EmoteAPI.setEmoteClient("", minecraft.player);
 		if (id >= 0 && id < 6) {
 			this.slotIndex = id;
 			playPreview(this.keys.emotes.get(slotIndex));
@@ -143,23 +146,28 @@ public class GuiEmotes extends Screen {
 
 		for (int i = 0; i < visibleRows; i++) {
 			int idx = i + scrollOffset;
-			if (idx >= filteredKeys.size()) break;
+			if (idx >= filteredKeys.size())
+				break;
 			String key = filteredKeys.get(idx);
 			boolean isSelected = (idx == selectedIndex);
 			boolean isHovered = mouseX < LIST_WIDTH && mouseY >= startY + i * rowH && mouseY < startY + (i + 1) * rowH;
 			int bg = isSelected ? 0xFF4444AA : (isHovered ? 0xFF333355 : 0x00000000);
-			if (bg != 0) GuiElement.fill(0, startY + i * rowH, LIST_WIDTH, startY + (i + 1) * rowH, bg);
-			this.textRenderer.drawWithShadow(formatEmoteName(key), 5, startY + i * rowH + 2, isSelected ? 0xFFFFFF : 0xCCCCCC);
+			if (bg != 0)
+				GuiElement.fill(0, startY + i * rowH, LIST_WIDTH, startY + (i + 1) * rowH, bg);
+			this.textRenderer.drawWithShadow(formatEmoteName(key), 5, startY + i * rowH + 2,
+					isSelected ? 0xFFFFFF : 0xCCCCCC);
 		}
 
 		if (filteredKeys.size() > visibleRows) {
 			int scrollH = Math.max(10, (int) ((float) visibleRows / filteredKeys.size() * listH));
-			int scrollY = startY + (int) ((float) scrollOffset / Math.max(1, filteredKeys.size() - visibleRows) * (listH - scrollH));
+			int scrollY = startY
+					+ (int) ((float) scrollOffset / Math.max(1, filteredKeys.size() - visibleRows) * (listH - scrollH));
 			GuiElement.fill(LIST_WIDTH - 4, scrollY, LIST_WIDTH - 1, scrollY + scrollH, 0xFF888888);
 		}
 
 		// Bottom bar
-		this.fillGradient(LIST_WIDTH, this.height - BOTTOM_HEIGHT - 20, this.width, this.height - BOTTOM_HEIGHT, 0x00000000, 0x88000000);
+		this.fillGradient(LIST_WIDTH, this.height - BOTTOM_HEIGHT - 20, this.width, this.height - BOTTOM_HEIGHT,
+				0x00000000, 0x88000000);
 		GuiElement.fill(LIST_WIDTH, this.height - BOTTOM_HEIGHT, this.width, this.height, 0x99000000);
 
 		// Model preview
@@ -198,7 +206,8 @@ public class GuiEmotes extends Screen {
 		this.textRenderer.drawWithShadow(subtitle, LIST_WIDTH + 5 + this.textRenderer.getWidth(title), 10, 0xAAAAAA);
 
 		// Slot label
-		this.textRenderer.drawWithShadow("Editing slot: " + (slotIndex + 1), LIST_WIDTH + 5, this.height - BOTTOM_HEIGHT + 5, 0xAAAAAA);
+		this.textRenderer.drawWithShadow("Editing slot: " + (slotIndex + 1), LIST_WIDTH + 5,
+				this.height - BOTTOM_HEIGHT + 5, 0xAAAAAA);
 
 		super.render(mouseX, mouseY, partialTicks);
 	}
@@ -237,7 +246,8 @@ public class GuiEmotes extends Screen {
 
 		int startY = 32;
 		int rowH = 12;
-		if (button == 0 && mouseX >= 0 && mouseX < LIST_WIDTH && mouseY >= startY && mouseY < this.height - BOTTOM_HEIGHT) {
+		if (button == 0 && mouseX >= 0 && mouseX < LIST_WIDTH && mouseY >= startY
+				&& mouseY < this.height - BOTTOM_HEIGHT) {
 			int idx = (mouseY - startY) / rowH + scrollOffset;
 			if (idx >= 0 && idx < filteredKeys.size()) {
 				this.selectedIndex = idx;
@@ -304,13 +314,16 @@ public class GuiEmotes extends Screen {
 	}
 
 	private void playPreview(String key) {
-		if (this.controller == null || this.controller.animation == null || this.controller.config == null) return;
+		if (this.controller == null || this.controller.animation == null || this.controller.config == null)
+			return;
 		try {
-			mchorse.emoticons.skin_n_bones.api.animation.model.ActionConfig actionConfig = this.controller.config.config.actions.getConfig("emote_" + key);
+			ActionConfig actionConfig = this.controller.config.config.actions
+					.getConfig("emote_" + key);
 			if (actionConfig != null) {
 				this.controller.setEmote(this.controller.animation.createAction(null, actionConfig, true));
 			}
-		} catch (Exception e) { /* preview not critical */ }
+		} catch (Exception e) {
+			/* preview not critical */ }
 	}
 
 	private void updateSlotButton(int idx) {
@@ -320,9 +333,11 @@ public class GuiEmotes extends Screen {
 	}
 
 	public static String formatEmoteName(String key) {
-		if (key == null || key.isEmpty()) return "";
+		if (key == null || key.isEmpty())
+			return "";
 		Emote emote = Emotes.EMOTES.get(key);
-		if (emote != null && !emote.customTitle.isEmpty()) return emote.customTitle;
+		if (emote != null && !emote.customTitle.isEmpty())
+			return emote.customTitle;
 		StringBuilder sb = new StringBuilder();
 		for (String part : key.split("_")) {
 			if (!part.isEmpty()) {
@@ -333,4 +348,3 @@ public class GuiEmotes extends Screen {
 		return sb.toString().trim();
 	}
 }
-

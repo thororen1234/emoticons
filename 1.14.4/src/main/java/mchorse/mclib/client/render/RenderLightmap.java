@@ -7,11 +7,10 @@ import net.minecraft.client.render.model.Model;
 import net.minecraft.entity.living.LivingEntity;
 import net.minecraft.resource.Identifier;
 
-public class RenderLightmap extends LivingEntityRenderer {
-	private static RenderLightmap instance;
+public class RenderLightmap extends LivingEntityRenderer<LivingEntity, Model<LivingEntity>> {
 
 	public static void create() {
-		instance = new RenderLightmap(Minecraft.getInstance().getEntityRenderDispatcher(), null, 0.0f);
+		new RenderLightmap(Minecraft.getInstance().getEntityRenderDispatcher(), null, 0.0f);
 	}
 
 	public static boolean canRenderNamePlate(LivingEntity livingBase) {
@@ -28,7 +27,7 @@ public class RenderLightmap extends LivingEntityRenderer {
 	public static void renderNameplate(LivingEntity livingBase, String name, double x, double y, double z) {
 	}
 
-	public RenderLightmap(EntityRenderDispatcher dispatcher, Model model, float shadowSize) {
+	public RenderLightmap(EntityRenderDispatcher dispatcher, Model<LivingEntity> model, float shadowSize) {
 		super(dispatcher, model, shadowSize);
 	}
 
@@ -38,7 +37,7 @@ public class RenderLightmap extends LivingEntityRenderer {
 	}
 
 	@Override
-	public Identifier getTextureLocation(net.minecraft.entity.Entity entity) {
+	public Identifier getTextureLocation(LivingEntity entity) {
 		return null;
 	}
 }

@@ -28,11 +28,11 @@ public class AnimatorConfig {
 		this.scaleGui = 1.0f;
 		this.scaleItems = 1.0f;
 		this.renderHeldItems = true;
-		this.leftHands = new HashMap();
-		this.rightHands = new HashMap();
+		this.leftHands = new HashMap<>();
+		this.rightHands = new HashMap<>();
 		this.head = "head";
 		this.actions = new AnimatorActionsConfig();
-		this.meshes = new HashMap();
+		this.meshes = new HashMap<>();
 	}
 
 	public void copy(final AnimatorConfig config) {

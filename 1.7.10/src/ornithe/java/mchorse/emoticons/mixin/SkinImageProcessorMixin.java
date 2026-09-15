@@ -5,7 +5,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
@@ -41,7 +40,8 @@ public class SkinImageProcessorMixin {
 		}
 	}
 
-	private void copyMirror(BufferedImage to, BufferedImage from, int srcX, int srcY, int dstX, int dstY, int width, int height) {
+	private void copyMirror(BufferedImage to, BufferedImage from, int srcX, int srcY, int dstX, int dstY, int width,
+			int height) {
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				to.setRGB(dstX + (width - 1 - x), dstY + y, from.getRGB(srcX + x, srcY + y));
@@ -49,4 +49,3 @@ public class SkinImageProcessorMixin {
 		}
 	}
 }
-

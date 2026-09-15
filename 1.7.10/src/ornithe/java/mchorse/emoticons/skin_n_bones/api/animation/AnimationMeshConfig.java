@@ -30,7 +30,7 @@ public class AnimationMeshConfig {
 			this.texture = RLUtils.create(compound.get("Texture"));
 		}
 		if (compound.contains("Filtering")) {
-			int n = this.filtering = compound.getString("Filtering").equalsIgnoreCase("linear") ? 9729 : 9728;
+			this.filtering = compound.getString("Filtering").equalsIgnoreCase("linear") ? 9729 : 9728;
 		}
 		if (compound.contains("Normals")) {
 			this.normals = compound.getBoolean("Normals");
