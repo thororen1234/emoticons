@@ -8,7 +8,15 @@ Versions supported by branch:
 
 - 1.12.2
 
-### OrnitheMC
+### Fabric
 
-- 1.7.10
+- 1.14.4
+- 1.13.2
+- 1.12.2
+- 1.11.2
+- 1.10.2
+- 1.9.4
 - 1.8.9
+- 1.7.10
+
+### Quilt
