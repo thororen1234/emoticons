@@ -12,7 +12,7 @@ Versions supported by branch:
 
 ### Quilt
 
-### OrnitheMC
+### Ornithe
 
 - 1.14.4
 - 1.13.2
