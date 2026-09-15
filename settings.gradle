@@ -17,7 +17,7 @@ pluginManagement {
 	}
 }
 
-rootProject.name = 'emoticons-multiversion'
+rootProject.name = 'emoticons-ornithe'
 include ':1.7.10'
 include ':1.8.9'
 include ':1.9.4'
