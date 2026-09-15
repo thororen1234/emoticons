@@ -1,0 +1,3 @@
+rootProject.name = 'emoticons-forge'
+
+include '1.12.2'
