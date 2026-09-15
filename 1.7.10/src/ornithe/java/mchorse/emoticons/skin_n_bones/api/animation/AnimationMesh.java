@@ -278,6 +278,3 @@ public class AnimationMesh {
 	}
 }
 
-
-
-

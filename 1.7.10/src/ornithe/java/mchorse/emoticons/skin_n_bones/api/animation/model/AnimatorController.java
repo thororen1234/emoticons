@@ -1,6 +1,5 @@
 package mchorse.emoticons.skin_n_bones.api.animation.model;
 
-
 import mchorse.emoticons.skin_n_bones.api.animation.Animation;
 import mchorse.emoticons.skin_n_bones.api.animation.AnimationManager;
 import mchorse.emoticons.skin_n_bones.api.animation.AnimationMesh;

@@ -1,6 +1,5 @@
 package mchorse.emoticons.skin_n_bones.api.bobj;
 
-
 public class BOBJKeyframe {
 	public float frame;
 	public float value;

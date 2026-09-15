@@ -32,36 +32,62 @@ public class EmoteController implements ICosmetic {
 	private int emoteTimer;
 	private int effectTick = -1;
 	private double lastX, lastY, lastZ;
-	private int previousPerspective = -1;
 
-	public static ICosmetic get(Entity entity) { return get(entity.getUuid()); }
-	public static ICosmetic get(UUID id) { return cache.computeIfAbsent(id, k -> new EmoteController()); }
+	public static ICosmetic get(Entity entity) {
+		return get(entity.getUuid());
+	}
+
+	public static ICosmetic get(UUID id) {
+		return cache.computeIfAbsent(id, k -> new EmoteController());
+	}
+
 	public static void postUpdate(PlayerEntity player) {
 		EmoteController state = (EmoteController) get(player);
 		state.update(player);
 	}
+
 	public static void clear() {
-		for (EmoteController state : cache.values()) state.stop();
+		for (EmoteController state : cache.values())
+			state.stop();
 		cache.clear();
 	}
+
 	public static void retain(Set<UUID> players) {
 		Iterator<Map.Entry<UUID, EmoteController>> iterator = cache.entrySet().iterator();
 		while (iterator.hasNext()) {
 			Map.Entry<UUID, EmoteController> entry = iterator.next();
-			if (!players.contains(entry.getKey())) { entry.getValue().stop(); iterator.remove(); }
+			if (!players.contains(entry.getKey())) {
+				entry.getValue().stop();
+				iterator.remove();
+			}
 		}
 	}
-	public CosmeticMode getMode() { return mode; }
-	public void setMode(CosmeticMode mode) { this.mode = mode; }
-	public Emote getEmote() { return emote; }
+
+	public CosmeticMode getMode() {
+		return mode;
+	}
+
+	public void setMode(CosmeticMode mode) {
+		this.mode = mode;
+	}
+
+	public Emote getEmote() {
+		return emote;
+	}
+
 	public void setEmote(Emote next, LivingEntity entity) {
 		stop();
 		owner = entity;
-		lastX = entity.x; lastY = entity.y; lastZ = entity.z;
-		emoteTimer = 0; effectTick = -1;
-		if (next == null) return;
+		lastX = entity.x;
+		lastY = entity.y;
+		lastZ = entity.z;
+		emoteTimer = 0;
+		effectTick = -1;
+		if (next == null)
+			return;
 		setupAnimator(entity);
-		if (controller.animation == null) return;
+		if (controller.animation == null)
+			return;
 		emoteAction = controller.animation.createAction(null,
 				controller.userConfig.actions.getConfig("emote_" + next.key), next.looping);
 		if (emoteAction == null) {
@@ -71,29 +97,37 @@ public class EmoteController implements ICosmetic {
 		emote = next;
 		controller.setEmote(emoteAction);
 		next.startAnimation(controller);
-		if (entity == Minecraft.getInstance().player && ClientConfig.instance.thirdPerson) {
-			previousPerspective = Minecraft.getInstance().options.perspective;
-			if (previousPerspective == 0) Minecraft.getInstance().options.perspective = 1;
-		}
 		sound = EmoteSound.play(entity, next);
 	}
+
 	public void seek(int ticks) {
 		emoteTimer = Math.max(0, ticks);
-		if (emoteAction != null) emoteAction.seek(ticks);
+		if (emoteAction != null)
+			emoteAction.seek(ticks);
 	}
-	public int loopsDone() { return emote == null ? 0 : emoteTimer / Math.max(1, emote.duration); }
+
+	public int loopsDone() {
+		return emote == null ? 0 : emoteTimer / Math.max(1, emote.duration);
+	}
+
 	private void stop() {
-		if (emote != null && controller != null) emote.stopAnimation(controller);
-		emote = null; emoteAction = null;
-		if (controller != null) controller.setEmote(null);
-		if (sound != null) { sound.finish(); sound = null; }
-		if (previousPerspective != -1) {
-			Minecraft.getInstance().options.perspective = previousPerspective;
-			previousPerspective = -1;
+		if (emote != null && controller != null)
+			emote.stopAnimation(controller);
+		emote = null;
+		emoteAction = null;
+		if (controller != null)
+			controller.setEmote(null);
+		if (sound != null) {
+			sound.finish();
+			sound = null;
 		}
 	}
+
 	public void update(LivingEntity entity) {
-		if (owner != null && owner != entity) { stop(); controller = null; }
+		if (owner != null && owner != entity) {
+			stop();
+			controller = null;
+		}
 		owner = entity;
 		if (emote != null) {
 			double dx = entity.x - lastX, dy = entity.y - lastY, dz = entity.z - lastZ;
@@ -101,35 +135,49 @@ public class EmoteController implements ICosmetic {
 			if (!entity.isAlive() || entity.isSleeping() || moved || (!emote.looping && emoteTimer >= emote.duration)) {
 				boolean local = entity == Minecraft.getInstance().player;
 				stop();
-				if (local) mchorse.emoticons.network.ClientEmoteNetwork.send("");
+				if (local)
+					mchorse.emoticons.network.ClientEmoteNetwork.send("");
 			} else {
 				emoteTimer++;
 			}
 		}
-		lastX = entity.x; lastY = entity.y; lastZ = entity.z;
-		if (controller == null && !ClientConfig.instance.disableAnimations) setupAnimator(entity);
-		if (controller != null) controller.update(entity);
+		lastX = entity.x;
+		lastY = entity.y;
+		lastZ = entity.z;
+		if (controller == null && !ClientConfig.instance.disableAnimations)
+			setupAnimator(entity);
+		if (controller != null)
+			controller.update(entity);
 	}
+
 	private String model(LivingEntity entity) {
 		String skin = "default";
 		String style = ClientConfig.instance.model;
-		if ("3d".equals(style)) return skin + "_3d";
-		if ("simple".equals(style)) return skin + "_simple";
-		if ("simple_plus".equals(style)) return skin + "_simple_plus";
+		if ("3d".equals(style))
+			return skin + "_3d";
+		if ("simple".equals(style))
+			return skin + "_simple";
+		if ("simple_plus".equals(style))
+			return skin + "_simple_plus";
 		return skin;
 	}
+
 	public void setupAnimator(LivingEntity entity) {
 		String model = model(entity);
-		if (controller != null && model.equals(controller.animationName)) return;
+		if (controller != null && model.equals(controller.animationName))
+			return;
 		controller = new AnimatorEmoticonsController(model, new NbtCompound());
 		controller.fetchAnimation();
 		controller.setEmote(emoteAction);
 	}
+
 	public boolean render(LivingEntity entity, double x, double y, double z, float delta) {
 		setupAnimator(entity);
-		if (controller.animation == null || controller.animation.meshes.isEmpty()) return false;
+		if (controller.animation == null || controller.animation.meshes.isEmpty())
+			return false;
 		if (entity instanceof ClientPlayerEntity && controller.userConfig.meshes.containsKey("body")) {
-			controller.userConfig.meshes.get("body").texture = getFixedSkin(((ClientPlayerEntity) entity).getSkinTextureLocation());
+			controller.userConfig.meshes.get("body").texture = getFixedSkin(
+					((ClientPlayerEntity) entity).getSkinTextureLocation());
 		}
 		controller.render(entity, x, y, z, 0, delta);
 		if (emote != null && emoteAction != null && effectTick != emoteTimer && !Minecraft.getInstance().isPaused()) {
@@ -141,9 +189,12 @@ public class EmoteController implements ICosmetic {
 	}
 
 	private static final Map<Identifier, Identifier> FIXED_SKINS = new HashMap<>();
+
 	public static Identifier getFixedSkin(Identifier skin) {
-		if (skin == null) return null;
-		if (FIXED_SKINS.containsKey(skin)) return FIXED_SKINS.get(skin);
+		if (skin == null)
+			return null;
+		if (FIXED_SKINS.containsKey(skin))
+			return FIXED_SKINS.get(skin);
 
 		try {
 			Resource resource = Minecraft.getInstance().getResourceManager().getResource(skin);
@@ -171,18 +222,21 @@ public class EmoteController implements ICosmetic {
 					graphics.dispose();
 
 					DynamicTexture dynamicTexture = new DynamicTexture(newImage);
-					Identifier newLocation = new Identifier("emoticons", "fixed_skin_" + UUID.randomUUID().toString()); Minecraft.getInstance().getTextureManager().register(newLocation, dynamicTexture);
+					Identifier newLocation = new Identifier("emoticons", "fixed_skin_" + UUID.randomUUID().toString());
+					Minecraft.getInstance().getTextureManager().register(newLocation, dynamicTexture);
 					FIXED_SKINS.put(skin, newLocation);
 					return newLocation;
 				}
 			}
-		} catch (Exception e) {}
-		
+		} catch (Exception e) {
+		}
+
 		FIXED_SKINS.put(skin, skin);
 		return skin;
 	}
 
-	private static void copyMirror(BufferedImage to, BufferedImage from, int srcX, int srcY, int dstX, int dstY, int width, int height) {
+	private static void copyMirror(BufferedImage to, BufferedImage from, int srcX, int srcY, int dstX, int dstY,
+			int width, int height) {
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				to.setRGB(dstX + (width - 1 - x), dstY + y, from.getRGB(srcX + x, srcY + y));
@@ -190,7 +244,3 @@ public class EmoteController implements ICosmetic {
 		}
 	}
 }
-
-
-
-

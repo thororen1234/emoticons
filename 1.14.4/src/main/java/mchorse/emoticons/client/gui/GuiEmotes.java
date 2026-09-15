@@ -292,9 +292,7 @@ public class GuiEmotes extends Screen {
 		return super.mouseReleased(mouseX, mouseY, button);
 	}
 
-
-
-	@Override
+@Override
 	public boolean charTyped(char chr, int modifiers) {
 		if (searchFocused && chr >= 32 && chr < 127) {
 			searchText += chr;

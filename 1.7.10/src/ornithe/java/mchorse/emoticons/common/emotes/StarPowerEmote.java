@@ -9,10 +9,6 @@ import net.minecraft.client.Minecraft;
 
 import net.minecraft.entity.living.LivingEntity;
 
-
-
-
-
 public class StarPowerEmote extends Emote {
 	public StarPowerEmote(String name, int duration, boolean looping) {
 		super(name, duration, looping);

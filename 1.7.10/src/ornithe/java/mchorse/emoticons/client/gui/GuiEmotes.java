@@ -334,7 +334,3 @@ public class GuiEmotes extends Screen {
 	}
 }
 
-
-
-
-

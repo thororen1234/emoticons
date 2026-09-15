@@ -170,6 +170,3 @@ public class AnimatorConfig {
 	}
 }
 
-
-
-

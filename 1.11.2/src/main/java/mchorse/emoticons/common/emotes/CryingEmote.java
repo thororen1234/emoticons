@@ -8,7 +8,6 @@ import mchorse.emoticons.skin_n_bones.api.bobj.BOBJBone;
 import net.minecraft.entity.living.LivingEntity;
 import net.minecraft.entity.particle.ParticleType;
 
-
 public class CryingEmote extends Emote {
 	public CryingEmote(String name, int duration, boolean looping) {
 		super(name, duration, looping);
