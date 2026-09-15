@@ -10,6 +10,8 @@ Versions supported by branch:
 
 ### Fabric
 
+- 1.14.4
+
 ### Quilt
 
 ### Ornithe
