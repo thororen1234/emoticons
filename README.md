@@ -4,7 +4,11 @@
 
 Versions supported by branch:
 
-### ornithemc
+### Forge
+
+- 1.12.2
+
+### OrnitheMC
 
 - 1.7.10
 - 1.8.9
