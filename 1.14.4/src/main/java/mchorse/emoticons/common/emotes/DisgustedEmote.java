@@ -3,10 +3,12 @@ package mchorse.emoticons.common.emotes;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.utils.Time;
-import net.minecraft.entity.living.LivingEntity;
-import net.minecraft.entity.particle.ParticleTypes;
-
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.particle.ParticleTypes;
 import javax.vecmath.Vector4f;
+import net.minecraft.item.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.particle.ItemStackParticleEffect;
 
 public class DisgustedEmote extends Emote {
 	public DisgustedEmote(String name, int duration, boolean looping) {
@@ -22,7 +24,8 @@ public class DisgustedEmote extends Emote {
 			for (int i = 0; i < 10; i++) {
 				Vector4f result = animator.calcPosition(entity, armature.bones.get("head"), 0, 0.125F, 0.25F, partial);
 
-				entity.world.addParticle(ParticleTypes.CLOUD, result.x + this.rand(0.1F), result.y,
+				entity.world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM,
+						new ItemStack(Items.GREEN_DYE)), result.x + this.rand(0.1F), result.y,
 						result.z + this.rand(0.1F), this.rand(0.05F), -0.125F, this.rand(0.05F));
 			}
 		}

@@ -12,12 +12,11 @@ import mchorse.emoticons.capabilities.cosmetic.ICosmetic;
 import mchorse.emoticons.common.EmoteAPI;
 import mchorse.emoticons.common.emotes.Emote;
 import mchorse.emoticons.common.emotes.Emotes;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
-import net.minecraft.entity.living.player.PlayerEntity;
-import net.ornithemc.osl.keybinds.api.KeybindRegistry;
-import net.ornithemc.osl.keybinds.api.KeybindEvents;
-import net.ornithemc.osl.lifecycle.api.client.MinecraftClientEvents;
+import net.minecraft.entity.player.PlayerEntity;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 
 public class KeyboardHandler {
 	public static KeyBinding random;
@@ -55,21 +54,19 @@ public class KeyboardHandler {
 		stopEmote = new KeyBinding(pre + "stop_emote", KEY_NONE, pre + "category");
 		reloadEmotes = new KeyBinding(pre + "reload_emotes", KEY_NONE, pre + "category");
 
-		KeybindEvents.REGISTER_KEYBINDS.register(() -> {
-			KeybindRegistry.register(random);
-			KeybindRegistry.register(emote1);
-			KeybindRegistry.register(emote2);
-			KeybindRegistry.register(emote3);
-			KeybindRegistry.register(emote4);
-			KeybindRegistry.register(emote5);
-			KeybindRegistry.register(emote6);
-			KeybindRegistry.register(emotes);
-			KeybindRegistry.register(stopEmote);
-			KeybindRegistry.register(reloadEmotes);
-		});
+		random = KeyBindingHelper.registerKeyBinding(random);
+		emote1 = KeyBindingHelper.registerKeyBinding(emote1);
+		emote2 = KeyBindingHelper.registerKeyBinding(emote2);
+		emote3 = KeyBindingHelper.registerKeyBinding(emote3);
+		emote4 = KeyBindingHelper.registerKeyBinding(emote4);
+		emote5 = KeyBindingHelper.registerKeyBinding(emote5);
+		emote6 = KeyBindingHelper.registerKeyBinding(emote6);
+		emotes = KeyBindingHelper.registerKeyBinding(emotes);
+		stopEmote = KeyBindingHelper.registerKeyBinding(stopEmote);
+		reloadEmotes = KeyBindingHelper.registerKeyBinding(reloadEmotes);
 
-		MinecraftClientEvents.TICK_END.register(client -> {
-			if (client.player != null && client.screen == null && !client.isPaused()) {
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			if (client.player != null && client.currentScreen == null && !client.isPaused()) {
 				onKeyPress(client.player);
 			}
 		});
@@ -88,7 +85,7 @@ public class KeyboardHandler {
 		String key = null;
 		EmoteKeys emotesObj = ClientProxy.keys;
 
-		if (random.consumeClick()) {
+		if (random.wasPressed()) {
 			List<String> keys = new ArrayList<>();
 			keys.addAll(Emotes.EMOTES.keySet());
 			if (!keys.isEmpty()) {
@@ -97,33 +94,33 @@ public class KeyboardHandler {
 		}
 
 		if (emotesObj != null && emotesObj.emotes.size() >= 6) {
-			if (emote1.consumeClick())
+			if (emote1.wasPressed())
 				key = emotesObj.emotes.get(0);
-			if (emote2.consumeClick())
+			if (emote2.wasPressed())
 				key = emotesObj.emotes.get(1);
-			if (emote3.consumeClick())
+			if (emote3.wasPressed())
 				key = emotesObj.emotes.get(2);
-			if (emote4.consumeClick())
+			if (emote4.wasPressed())
 				key = emotesObj.emotes.get(3);
-			if (emote5.consumeClick())
+			if (emote5.wasPressed())
 				key = emotesObj.emotes.get(4);
-			if (emote6.consumeClick())
+			if (emote6.wasPressed())
 				key = emotesObj.emotes.get(5);
 		}
 
-		double dist = Math.abs(player.m_94091929().x) + Math.abs(player.m_94091929().z);
+		double dist = Math.abs(player.getVelocity().x) + Math.abs(player.getVelocity().z);
 
 		if (player.onGround && dist < 0.05 && key != null && !key.isEmpty()) {
 			EmoteAPI.setEmoteClient(key, player);
 		}
 
-		if (stopEmote.consumeClick() && emote != null) {
+		if (stopEmote.wasPressed() && emote != null) {
 			EmoteAPI.setEmoteClient("", player);
 		}
 
-		if (emotes.consumeClick()) {
-			Minecraft mc = Minecraft.getInstance();
-			if (mc.screen == null) {
+		if (emotes.wasPressed()) {
+			MinecraftClient mc = MinecraftClient.getInstance();
+			if (mc.currentScreen == null) {
 				try {
 					mc.openScreen(new GuiEmotes());
 				} catch (Exception e) {
@@ -132,7 +129,7 @@ public class KeyboardHandler {
 			}
 		}
 
-		if (reloadEmotes.consumeClick()) {
+		if (reloadEmotes.wasPressed()) {
 			mchorse.emoticons.ClientConfig.load();
 			ClientProxy.reloadActions();
 		}

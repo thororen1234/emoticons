@@ -6,8 +6,8 @@ import mchorse.emoticons.skin_n_bones.api.bobj.BOBJAction;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJData;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJLoader;
 import mchorse.emoticons.skin_n_bones.api.bobj.CompiledData;
-import net.minecraft.client.Minecraft;
-import net.minecraft.resource.Identifier;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL15;
 
 import java.util.ArrayList;
@@ -18,12 +18,12 @@ public class Animation {
 	public String name;
 	public BOBJData data;
 	public List<AnimationMesh> meshes;
-	public Minecraft mc;
+	public MinecraftClient mc;
 
 	public Animation(final String name, final BOBJData data) {
 		this.name = name;
 		this.data = data;
-		this.mc = Minecraft.getInstance();
+		this.mc = MinecraftClient.getInstance();
 		this.meshes = new ArrayList<>();
 	}
 

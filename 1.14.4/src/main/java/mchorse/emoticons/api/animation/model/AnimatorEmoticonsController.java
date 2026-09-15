@@ -6,14 +6,15 @@ import mchorse.emoticons.skin_n_bones.api.animation.AnimationMeshConfig;
 import mchorse.emoticons.skin_n_bones.api.animation.model.AnimatorController;
 import mchorse.emoticons.skin_n_bones.api.animation.model.AnimatorHeldItemConfig;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.living.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.resource.Identifier;
-
 import java.util.Map;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.DyeableItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Identifier;
 
 public class AnimatorEmoticonsController extends AnimatorController {
 
@@ -27,14 +28,15 @@ public class AnimatorEmoticonsController extends AnimatorController {
 	public ItemStack itemSlot;
 	public float itemSlotScale;
 
-	public AnimatorEmoticonsController(String name, NbtCompound data) {
+	public AnimatorEmoticonsController(String name, CompoundTag data) {
 		super(name, data);
 		this.itemSlot = null;
 		this.itemSlotScale = 0.0f;
 	}
 
 	@Override
-	public void renderAnimation(LivingEntity livingBase, AnimationMesh mesh, float yaw, float partialTicks) {
+	public void renderAnimation(LivingEntity livingBase, AnimationMesh mesh, float yaw,
+			float partialTicks) {
 		this.updateArmor(livingBase);
 		super.renderAnimation(livingBase, mesh, yaw, partialTicks);
 	}
@@ -46,7 +48,8 @@ public class AnimatorEmoticonsController extends AnimatorController {
 		}
 
 		float scaleItems = this.userConfig.scaleItems;
-		ItemStack heldItem = livingBase.getEquipment(net.minecraft.entity.EquipmentSlot.MAIN_HAND);
+		ItemStack heldItem = livingBase
+				.getEquippedStack(EquipmentSlot.MAINHAND);
 
 		if (this.itemSlot != null) {
 			if (this.itemSlotScale > 0.0f) {
@@ -84,7 +87,7 @@ public class AnimatorEmoticonsController extends AnimatorController {
 	}
 
 	private void updateArmorSlot(AnimationMeshConfig config, LivingEntity livingBase, int slot) {
-		ItemStack stack = livingBase.getEquipment(getSlot(slot));
+		ItemStack stack = livingBase.getEquippedStack(getSlot(slot));
 
 		if (stack != null && stack.getItem() instanceof ArmorItem) {
 			ArmorItem armor = (ArmorItem) stack.getItem();
@@ -92,8 +95,8 @@ public class AnimatorEmoticonsController extends AnimatorController {
 			config.texture = this.getArmorResource(livingBase, stack, slot, null);
 			config.color = -1;
 
-			if (armor instanceof net.minecraft.item.DyeableArmorItem) {
-				net.minecraft.item.DyeableArmorItem dyeable = (net.minecraft.item.DyeableArmorItem) armor;
+			if (armor instanceof DyeableItem) {
+				DyeableItem dyeable = (DyeableItem) armor;
 				if (dyeable.hasColor(stack)) {
 					config.color = 0xFF000000 | dyeable.getColor(stack);
 				}
@@ -104,22 +107,23 @@ public class AnimatorEmoticonsController extends AnimatorController {
 		}
 	}
 
-	private net.minecraft.entity.EquipmentSlot getSlot(int slot) {
+	private EquipmentSlot getSlot(int slot) {
 		switch (slot) {
 			case SLOT_HEAD:
-				return net.minecraft.entity.EquipmentSlot.HEAD;
+				return EquipmentSlot.HEAD;
 			case SLOT_CHEST:
-				return net.minecraft.entity.EquipmentSlot.CHEST;
+				return EquipmentSlot.CHEST;
 			case SLOT_LEGS:
-				return net.minecraft.entity.EquipmentSlot.LEGS;
+				return EquipmentSlot.LEGS;
 			case SLOT_FEET:
-				return net.minecraft.entity.EquipmentSlot.FEET;
+				return EquipmentSlot.FEET;
 		}
-		return net.minecraft.entity.EquipmentSlot.MAIN_HAND;
+		return EquipmentSlot.MAINHAND;
 	}
 
-	private Identifier getArmorResource(Entity entity, ItemStack stack, int slot, String suffix) {
-		String texture = ((ArmorItem) stack.getItem()).getTier().getName();
+	private Identifier getArmorResource(Entity entity,
+			ItemStack stack, int slot, String suffix) {
+		String texture = ((ArmorItem) stack.getItem()).getMaterial().getName();
 		String namespace = "minecraft";
 		int index = texture.indexOf(':');
 

@@ -1,7 +1,6 @@
 plugins {
 	id 'maven-publish'
 	id 'fabric-loom' version '1.17-SNAPSHOT'
-	id 'ploceus' version '1.17-SNAPSHOT'
 }
 
 base {
@@ -10,16 +9,11 @@ base {
 version = "${project.version}+mc${project.minecraft_version}"
 group = project.maven_group
 
-ploceus {
-	setIntermediaryGeneration(2)
-}
-
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_build}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	mappings ploceus.featherMappings(project.feather_build)
-
-	ploceus.dependOsl(project.osl_version)
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 	implementation 'java3d:vecmath:1.5.2'
 	include 'java3d:vecmath:1.5.2'
 }
@@ -54,8 +48,4 @@ publishing {
 		}
 	}
 
-}
-
-sourceSets.main.resources {
-	exclude 'assets/mclib/**'
 }

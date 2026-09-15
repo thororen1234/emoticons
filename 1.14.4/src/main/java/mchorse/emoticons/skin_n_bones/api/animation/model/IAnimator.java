@@ -1,7 +1,7 @@
 package mchorse.emoticons.skin_n_bones.api.animation.model;
 
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
-import net.minecraft.entity.living.LivingEntity;
+import net.minecraft.entity.LivingEntity;
 
 public interface IAnimator {
 	public void refresh();

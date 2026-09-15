@@ -2,8 +2,7 @@ package mchorse.emoticons.common.emotes;
 
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
-import net.minecraft.entity.living.LivingEntity;
-
+import net.minecraft.entity.LivingEntity;
 import java.util.Random;
 
 public class Emote {

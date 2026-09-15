@@ -2,14 +2,14 @@ package mchorse.emoticons.skin_n_bones.api.animation.model;
 
 import mchorse.emoticons.skin_n_bones.api.animation.Animation;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
-import net.minecraft.entity.living.LivingEntity;
-import net.minecraft.entity.living.player.PlayerEntity;
-
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.util.UseAction;
 
 public class Animator implements IAnimator {
 	public ActionPlayback idle;
@@ -116,7 +116,7 @@ public class Animator implements IAnimator {
 	protected void controlActions(LivingEntity target) {
 		double dx = target.x - prevX, dz = target.z - prevZ;
 		boolean flying = target instanceof PlayerEntity && ((PlayerEntity) target).abilities.flying;
-		boolean wet = target.isInWater();
+		boolean wet = target.isTouchingWater();
 		float threshold = flying ? 0.1F : wet ? 0.025F : 0.01F;
 		boolean moves = Math.abs(dx) > threshold || Math.abs(dz) > threshold;
 		float speed = (float) Math.sqrt(dx * dx + dz * dz);
@@ -124,12 +124,12 @@ public class Animator implements IAnimator {
 		else if (target.getHealth() <= 0) setActiveAction(dying);
 		else if (target.isSleeping()) setActiveAction(sleeping);
 		else if (wet) setActiveAction(moves ? swimming : swimmingIdle);
-		else if (target.isRiding()) setActiveAction(moves ? riding : ridingIdle);
+		else if (target.hasVehicle()) setActiveAction(moves ? riding : ridingIdle);
 		else if (flying) setActiveAction(moves ? this.flying : flyingIdle);
-		else if (target.isSneaking()) {
+		else if (target.isCustomNameVisible()) {
 			setActiveAction(moves ? crouching : crouchingIdle);
 			if (crouching != null) crouching.setSpeed((target.forwardSpeed >= 0 ? speed : -speed) / 0.065F);
-		} else if (!target.onGround && target.m_94091929().y < 0 && target.fallDistance > 1.25) setActiveAction(falling);
+		} else if (!target.onGround && target.getVelocity().y < 0 && target.fallDistance > 1.25) setActiveAction(falling);
 		else if (target.isSprinting() && sprinting != null) {
 			setActiveAction(sprinting); sprinting.setSpeed(speed / 0.281F);
 		} else {
@@ -137,25 +137,25 @@ public class Animator implements IAnimator {
 			if (running != null) running.setSpeed((target.forwardSpeed >= 0 ? speed : -speed) / 0.216F);
 		}
 		if (target.onGround && !wasOnGround && !target.isSprinting() && prevMY < -0.5) addAction(land);
-		if (!target.onGround && wasOnGround && Math.abs(target.m_94091929().y) > 0.2) addAction(jump);
+		if (!target.onGround && wasOnGround && Math.abs(target.getVelocity().y) > 0.2) addAction(jump);
 		boolean shooting = wasShooting, consuming = wasConsuming;
 		wasShooting = false; wasConsuming = false;
-		ItemStack held = target.getEquipment(net.minecraft.entity.EquipmentSlot.MAIN_HAND);
+		ItemStack held = target.getEquippedStack(EquipmentSlot.MAINHAND);
 		if (held != null && target instanceof PlayerEntity && ((PlayerEntity) target).isUsingItem()) {
-			net.minecraft.item.UseAction action = held.getUseAction();
-			if (action == net.minecraft.item.UseAction.BOW) {
+			UseAction action = held.getUseAction();
+			if (action == UseAction.BOW) {
 				if (!actions.contains(shoot)) addAction(shoot);
 				wasShooting = true;
-			} else if (action == net.minecraft.item.UseAction.EAT || action == net.minecraft.item.UseAction.DRINK) {
+			} else if (action == UseAction.EAT || action == UseAction.DRINK) {
 				if (!actions.contains(consume)) addAction(consume);
 				wasConsuming = true;
 			}
 		}
 		if (shooting && !wasShooting && shoot != null) shoot.fade();
 		if (consuming && !wasConsuming && consume != null) consume.fade();
-		if (target.damagedTimer == target.damagedTime - 1) addAction(hurt);
-		if (target.armSwinging && target.armSwingingTicks == 0 && !target.isSleeping()) addAction(swipe);
-		prevX = target.x; prevZ = target.z; prevMY = target.m_94091929().y;
+		if (target.hurtTime == 9) addAction(hurt);
+		if (target.isHandSwinging && target.handSwingTicks == 0 && !target.isSleeping()) addAction(swipe);
+		prevX = target.x; prevZ = target.z; prevMY = target.getVelocity().y;
 		wasOnGround = target.onGround;
 	}
 
@@ -201,4 +201,3 @@ public class Animator implements IAnimator {
 		}
 	}
 }
-

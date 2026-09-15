@@ -5,9 +5,8 @@ import javax.vecmath.Vector4f;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJBone;
-
-import net.minecraft.entity.living.LivingEntity;
-import net.minecraft.entity.particle.ParticleTypes;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.particle.ParticleTypes;
 
 public class StarPowerEmote extends Emote {
 	public StarPowerEmote(String name, int duration, boolean looping) {
@@ -23,7 +22,7 @@ public class StarPowerEmote extends Emote {
 			Vector4f result = animator.calcPosition(entity, hand, 0, 0.15F, 0, partial);
 
 			for (int i = 0, c = 15; i < c; i++) {
-				entity.world.addParticle(ParticleTypes.FIREWORK, result.x, result.y, result.z,
+				entity.world.addParticle(ParticleTypes.END_ROD, result.x, result.y, result.z,
 						this.rand.nextGaussian() * 0.05, -this.rand.nextDouble() * 0.05,
 						this.rand.nextGaussian() * 0.05);
 			}

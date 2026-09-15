@@ -1,64 +1,66 @@
 package mchorse.emoticons.network;
 
-import net.ornithemc.osl.core.api.util.NamespacedIdentifier;
-import net.ornithemc.osl.core.api.util.NamespacedIdentifiers;
-import net.ornithemc.osl.networking.api.ChannelRegistry;
-import net.ornithemc.osl.networking.api.server.ServerPlayNetworking;
-import net.ornithemc.osl.networking.api.server.ServerConnectionEvents;
-import net.ornithemc.osl.lifecycle.api.server.MinecraftServerEvents;
-import net.minecraft.server.entity.living.player.ServerPlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import java.util.*;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.PacketByteBuf;
 
 /** Version 1 protocol: C2S key; S2C UUID, key and elapsed ticks. */
 public final class EmoteNetwork {
-	public static final NamespacedIdentifier CHANNEL = NamespacedIdentifiers.parse("emoticons:emote");
+	public static final Identifier CHANNEL = new Identifier("emoticons", "emote");
 	private static final Map<UUID, State> ACTIVE = new HashMap<>();
 
 	public static void init() {
-		ChannelRegistry.register(CHANNEL);
-		ServerPlayNetworking.registerListener(CHANNEL, (ctx, buffer) -> {
-			ctx.ensureOnMainThread();
+		ServerPlayNetworking.registerGlobalReceiver(CHANNEL, (server, player, handler, buffer, responseSender) -> {
 			String key = buffer.readString(128);
-			ServerPlayerEntity player = ctx.player();
+			server.execute(() -> {
 			if (!key.isEmpty() && (!EmoteCatalog.valid(key) || !player.isAlive() || !player.onGround)) {
 				send(player, player.getUuid(), "", 0);
 				return;
 			}
 			if (key.isEmpty()) ACTIVE.remove(player.getUuid());
 			else ACTIVE.put(player.getUuid(), new State(player, key));
-			broadcast(player.getUuid(), key, 0);
+			broadcast(server, player.getUuid(), key, 0);
+			});
 		});
-		ServerConnectionEvents.PLAY_READY.register((server, player) -> {
+		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+			ServerPlayerEntity player = handler.player;
 			for (Map.Entry<UUID, State> entry : ACTIVE.entrySet()) {
 				State state = entry.getValue();
 				send(player, entry.getKey(), state.key, state.age);
 			}
 		});
-		ServerConnectionEvents.DISCONNECT.register((server, player) -> {
-			if (ACTIVE.remove(player.getUuid()) != null) broadcast(player.getUuid(), "", 0);
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+			ServerPlayerEntity player = handler.player;
+			if (ACTIVE.remove(player.getUuid()) != null) broadcast(server, player.getUuid(), "", 0);
 		});
-		MinecraftServerEvents.STOP.register(server -> ACTIVE.clear());
-		MinecraftServerEvents.TICK_END.register(server -> {
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> ACTIVE.clear());
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			Iterator<Map.Entry<UUID, State>> iterator = ACTIVE.entrySet().iterator();
 			while (iterator.hasNext()) {
 				Map.Entry<UUID, State> entry = iterator.next();
 				State state = entry.getValue();
 				if (state.expired()) {
 					iterator.remove();
-					broadcast(entry.getKey(), "", 0);
+					broadcast(server, entry.getKey(), "", 0);
 				} else state.age++;
 			}
 		});
 	}
 	private static void send(ServerPlayerEntity player, UUID id, String key, int age) {
-		ServerPlayNetworking.send(player, CHANNEL, buffer -> {
-			buffer.writeUuid(id); buffer.writeString(key, 128); buffer.writeInt(age);
-		});
+		PacketByteBuf buffer = PacketByteBufs.create();
+		buffer.writeUuid(id); buffer.writeString(key, 128); buffer.writeInt(age);
+		ServerPlayNetworking.send(player, CHANNEL, buffer);
 	}
-	private static void broadcast(UUID id, String key, int age) {
-		ServerPlayNetworking.send(CHANNEL, buffer -> {
-			buffer.writeUuid(id); buffer.writeString(key, 128); buffer.writeInt(age);
-		});
+	private static void broadcast(MinecraftServer server, UUID id, String key, int age) {
+		for (ServerPlayerEntity player : PlayerLookup.all(server)) send(player, id, key, age);
 	}
 	private static final class State {
 		final ServerPlayerEntity player;

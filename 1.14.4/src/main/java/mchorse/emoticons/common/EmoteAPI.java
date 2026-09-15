@@ -4,7 +4,7 @@ import mchorse.emoticons.capabilities.cosmetic.EmoteController;
 import mchorse.emoticons.common.emotes.Emote;
 import mchorse.emoticons.common.emotes.Emotes;
 import mchorse.emoticons.network.ClientEmoteNetwork;
-import net.minecraft.entity.living.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 
 public final class EmoteAPI {
 	public static void setEmoteClient(String key, PlayerEntity player) {

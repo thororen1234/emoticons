@@ -1,7 +1,7 @@
 package mchorse.emoticons.capabilities.cosmetic;
 
 import mchorse.emoticons.common.emotes.Emote;
-import net.minecraft.entity.living.LivingEntity;
+import net.minecraft.entity.LivingEntity;
 
 public interface ICosmetic {
 	public CosmeticMode getMode();

@@ -1,10 +1,9 @@
 package mchorse.emoticons.skin_n_bones.api.animation.model;
 
 import mchorse.emoticons.skin_n_bones.api.animation.AnimationMeshConfig;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +57,7 @@ public class AnimatorConfig {
 		}
 	}
 
-	public void fromNBT(final NbtCompound NbtCompound) {
+	public void fromNBT(final CompoundTag NbtCompound) {
 		if (NbtCompound.contains("Name")) {
 			this.name = NbtCompound.getString("Name");
 		}
@@ -87,21 +86,21 @@ public class AnimatorConfig {
 			this.actions.fromNBT(NbtCompound.getCompound("Actions"));
 		}
 		if (NbtCompound.contains("Meshes")) {
-			final NbtCompound meshesCompound = NbtCompound.getCompound("Meshes");
+			final CompoundTag meshesCompound = NbtCompound.getCompound("Meshes");
 			for (final String s : meshesCompound.getKeys()) {
-				final NbtElement mesh = meshesCompound.get(s);
+				final Tag mesh = meshesCompound.get(s);
 				AnimationMeshConfig AnimationMeshConfig = this.meshes.get(s);
 				if (AnimationMeshConfig == null) {
 					this.meshes.put(s, AnimationMeshConfig = new AnimationMeshConfig());
 				}
-				AnimationMeshConfig.fromNBT((NbtCompound) mesh);
+				AnimationMeshConfig.fromNBT((CompoundTag) mesh);
 			}
 		}
 	}
 
-	public NbtCompound toNBT(NbtCompound NbtCompound) {
+	public CompoundTag toNBT(CompoundTag NbtCompound) {
 		if (NbtCompound == null) {
-			NbtCompound = new NbtCompound();
+			NbtCompound = new CompoundTag();
 		}
 		if (!this.name.isEmpty()) {
 			NbtCompound.putString("Name", this.name);
@@ -127,12 +126,12 @@ public class AnimatorConfig {
 		if (!this.rightHands.isEmpty()) {
 			NbtCompound.put("RightHands", this.writeHandsToNBT(this.rightHands));
 		}
-		final NbtCompound actionCompouind = this.actions.toNBT((NbtCompound) null);
+		final CompoundTag actionCompouind = this.actions.toNBT((CompoundTag) null);
 		if (actionCompouind != null && !actionCompouind.isEmpty()) {
 			NbtCompound.put("Actions", actionCompouind);
 		}
 		if (!this.meshes.isEmpty()) {
-			final NbtCompound meshesCompound = new NbtCompound();
+			final CompoundTag meshesCompound = new CompoundTag();
 			for (final Map.Entry<String, AnimationMeshConfig> entry : this.meshes.entrySet()) {
 				meshesCompound.put(entry.getKey(), entry.getValue().toNBT(null));
 			}
@@ -141,16 +140,16 @@ public class AnimatorConfig {
 		return NbtCompound;
 	}
 
-	private void readHandsFromNBT(final Map<String, AnimatorHeldItemConfig> map, final NbtElement base) {
+	private void readHandsFromNBT(final Map<String, AnimatorHeldItemConfig> map, final Tag base) {
 		map.clear();
-		if (base instanceof NbtList) {
-			final NbtList listCompound = (NbtList) base;
+		if (base instanceof ListTag) {
+			final ListTag listCompound = (ListTag) base;
 			for (int i = 0; i < listCompound.size(); ++i) {
 				final String key = listCompound.getString(i);
 				map.put(key, new AnimatorHeldItemConfig(key));
 			}
-		} else if (base instanceof NbtCompound) {
-			final NbtCompound NbtCompound = (NbtCompound) base;
+		} else if (base instanceof CompoundTag) {
+			final CompoundTag NbtCompound = (CompoundTag) base;
 			for (final String s : NbtCompound.getKeys()) {
 				AnimatorHeldItemConfig config = map.get(s);
 				if (config == null) {
@@ -161,8 +160,8 @@ public class AnimatorConfig {
 		}
 	}
 
-	private NbtCompound writeHandsToNBT(final Map<String, AnimatorHeldItemConfig> map) {
-		final NbtCompound NbtCompound = new NbtCompound();
+	private CompoundTag writeHandsToNBT(final Map<String, AnimatorHeldItemConfig> map) {
+		final CompoundTag NbtCompound = new CompoundTag();
 		for (final Map.Entry<String, AnimatorHeldItemConfig> entry : map.entrySet()) {
 			NbtCompound.put(entry.getKey(), entry.getValue().toNBT(null));
 		}

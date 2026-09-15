@@ -1,10 +1,9 @@
 package mchorse.mclib.utils.resources;
 
 import com.google.common.base.Objects;
-import net.minecraft.resource.Identifier;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.util.Identifier;
 
 public class MultiResourceLocation
 		extends Identifier {
@@ -19,15 +18,19 @@ public class MultiResourceLocation
 		super("it_would_be_very_ironic", "if_this_would_match_with_regular_rls");
 		this.children.add(RLUtils.create(string, string2));
 	}
+
 	public String getResourceDomain() {
 		return this.children.isEmpty() ? "" : this.children.get(0).getNamespace();
 	}
+
 	public String getPath() {
 		return this.children.isEmpty() ? "" : this.children.get(0).getPath();
 	}
+
 	public String toString() {
 		return this.getNamespace() + ":" + this.getPath();
 	}
+
 	public boolean equals(Object object) {
 		if (object instanceof MultiResourceLocation) {
 			MultiResourceLocation other = (MultiResourceLocation) object;
@@ -43,6 +46,7 @@ public class MultiResourceLocation
 		}
 		return super.equals(object);
 	}
+
 	public int hashCode() {
 		int n = super.hashCode();
 		int n2 = this.children.size();

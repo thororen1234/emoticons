@@ -9,12 +9,12 @@ import mchorse.emoticons.common.emotes.Emote;
 import mchorse.emoticons.skin_n_bones.api.animation.model.ActionPlayback;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.client.EmoteSound;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.living.player.ClientPlayerEntity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.living.LivingEntity;
-import net.minecraft.entity.living.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.entity.LivingEntity;
 import java.util.*;
 
 /**
@@ -32,6 +32,7 @@ public class EmoteController implements ICosmetic {
 	private int emoteTimer;
 	private int effectTick = -1;
 	private double lastX, lastY, lastZ;
+	private int previousPerspective = -1;
 
 	public static ICosmetic get(Entity entity) {
 		return get(entity.getUuid());
@@ -97,6 +98,11 @@ public class EmoteController implements ICosmetic {
 		emote = next;
 		controller.setEmote(emoteAction);
 		next.startAnimation(controller);
+		MinecraftClient minecraft = MinecraftClient.getInstance();
+		if (entity == minecraft.player && ClientConfig.instance.thirdPerson && minecraft.options.perspective == 0) {
+			previousPerspective = 0;
+			minecraft.options.perspective = 1;
+		}
 		sound = EmoteSound.play(entity, next);
 	}
 
@@ -121,6 +127,12 @@ public class EmoteController implements ICosmetic {
 			sound.finish();
 			sound = null;
 		}
+		if (previousPerspective != -1) {
+			MinecraftClient minecraft = MinecraftClient.getInstance();
+			if (minecraft.options.perspective == 1)
+				minecraft.options.perspective = previousPerspective;
+			previousPerspective = -1;
+		}
 	}
 
 	public void update(LivingEntity entity) {
@@ -133,7 +145,7 @@ public class EmoteController implements ICosmetic {
 			double dx = entity.x - lastX, dy = entity.y - lastY, dz = entity.z - lastZ;
 			boolean moved = ClientConfig.instance.stopOnMove && dx * dx + dy * dy + dz * dz > 0.000225;
 			if (!entity.isAlive() || entity.isSleeping() || moved || (!emote.looping && emoteTimer >= emote.duration)) {
-				boolean local = entity == Minecraft.getInstance().player;
+				boolean local = entity == MinecraftClient.getInstance().player;
 				stop();
 				if (local)
 					ClientEmoteNetwork.send("");
@@ -151,7 +163,7 @@ public class EmoteController implements ICosmetic {
 	}
 
 	private String model(LivingEntity entity) {
-		String skin = entity instanceof ClientPlayerEntity ? ((ClientPlayerEntity) entity).getModelType() : "default";
+		String skin = entity instanceof AbstractClientPlayerEntity ? ((AbstractClientPlayerEntity) entity).getModel() : "default";
 		String style = ClientConfig.instance.model;
 		if ("3d".equals(style))
 			return skin + "_3d";
@@ -166,7 +178,7 @@ public class EmoteController implements ICosmetic {
 		String model = model(entity);
 		if (controller != null && model.equals(controller.animationName))
 			return;
-		controller = new AnimatorEmoticonsController(model, new NbtCompound());
+		controller = new AnimatorEmoticonsController(model, new CompoundTag());
 		controller.fetchAnimation();
 		controller.setEmote(emoteAction);
 	}
@@ -175,13 +187,13 @@ public class EmoteController implements ICosmetic {
 		setupAnimator(entity);
 		if (controller.animation == null || controller.animation.meshes.isEmpty())
 			return false;
-		if (entity instanceof ClientPlayerEntity && controller.userConfig.meshes.containsKey("body")) {
-			controller.userConfig.meshes.get("body").texture = ((ClientPlayerEntity) entity).getSkinTextureLocation();
+		if (entity instanceof AbstractClientPlayerEntity && controller.userConfig.meshes.containsKey("body")) {
+			controller.userConfig.meshes.get("body").texture = ((AbstractClientPlayerEntity) entity).getSkinTexture();
 		}
 		controller.render(entity, x, y, z, 0, delta);
 		// Emit effects at most once per simulation tick, regardless of frame rate or
 		// render passes.
-		if (emote != null && emoteAction != null && effectTick != emoteTimer && !Minecraft.getInstance().isPaused()) {
+		if (emote != null && emoteAction != null && effectTick != emoteTimer && !MinecraftClient.getInstance().isPaused()) {
 			effectTick = emoteTimer;
 			BOBJArmature armature = controller.animation.meshes.get(0).armature;
 			emote.progressAnimation(entity, armature, controller, (int) emoteAction.getTick(0), delta);

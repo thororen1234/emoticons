@@ -3,9 +3,8 @@ package mchorse.emoticons.common.emotes;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.utils.Time;
-import net.minecraft.entity.living.LivingEntity;
-import net.minecraft.entity.particle.ParticleTypes;
-
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.particle.ParticleTypes;
 import javax.vecmath.Vector4f;
 
 public class SneezeEmote extends Emote {

@@ -5,8 +5,8 @@ import javax.vecmath.Vector4f;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJBone;
-import net.minecraft.entity.living.LivingEntity;
-import net.minecraft.entity.particle.ParticleTypes;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.particle.ParticleTypes;
 
 public class CryingEmote extends Emote {
 	public CryingEmote(String name, int duration, boolean looping) {
@@ -19,7 +19,7 @@ public class CryingEmote extends Emote {
 			BOBJBone hand = armature.bones.get("head");
 			Vector4f result = animator.calcPosition(entity, hand, 0, 0.5F, 0.35F, partial);
 
-			entity.world.addParticle(ParticleTypes.SPLASH, result.x, result.y, result.z, 1, -1, 1);
+			entity.world.addParticle(ParticleTypes.RAIN, result.x, result.y, result.z, 1, -1, 1);
 		}
 	}
 }

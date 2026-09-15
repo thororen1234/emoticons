@@ -2,11 +2,10 @@ package mchorse.emoticons.common.emotes;
 
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
-import net.minecraft.entity.living.LivingEntity;
 import net.minecraft.block.Blocks;
-import net.minecraft.item.Items;
-import net.minecraft.item.Item;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 public class RockPaperScissorsEmote
 		extends Emote {
@@ -35,7 +34,8 @@ public class RockPaperScissorsEmote
 	}
 
 	public Emote getDynamicEmote(String string) {
-		if (!string.equals("rock") && !string.equals("paper") && !string.equals("scissors")) return null;
+		if (!string.equals("rock") && !string.equals("paper") && !string.equals("scissors"))
+			return null;
 		return new RockPaperScissorsEmote(this.key, this.duration, this.looping, string);
 	}
 
@@ -45,17 +45,20 @@ public class RockPaperScissorsEmote
 
 	public void startAnimation(AnimatorEmoticonsController controller) {
 		if (this.suffix.equals("rock")) {
-			controller.itemSlot = new ItemStack(Blocks.STONE, 1);
+			controller.itemSlot = new ItemStack(Blocks.LAVA, 1);
 		} else if (this.suffix.equals("paper")) {
 			controller.itemSlot = new ItemStack(Items.PAPER, 1);
 		} else if (this.suffix.equals("scissors")) {
-			controller.itemSlot = new ItemStack((Item) Items.SHEARS, 1);
+			controller.itemSlot = new ItemStack(Items.SHEARS, 1);
 		}
 		controller.itemSlotScale = 0.0f;
 	}
 
-	public void progressAnimation(LivingEntity livingBase, BOBJArmature armature, AnimatorEmoticonsController controller, int n, float f) {
-		controller.itemSlotScale = n > 25 && n < 55 ? (n < 30 ? ((float) (n - 25) + f) / 5.0f : (n >= 50 ? 1.0f - ((float) (n - 50) + f) / 5.0f : 1.0f)) : 0.0f;
+	public void progressAnimation(LivingEntity livingBase, BOBJArmature armature,
+			AnimatorEmoticonsController controller, int n, float f) {
+		controller.itemSlotScale = n > 25 && n < 55
+				? (n < 30 ? ((float) (n - 25) + f) / 5.0f : (n >= 50 ? 1.0f - ((float) (n - 50) + f) / 5.0f : 1.0f))
+				: 0.0f;
 	}
 
 	public void stopAnimation(AnimatorEmoticonsController controller) {

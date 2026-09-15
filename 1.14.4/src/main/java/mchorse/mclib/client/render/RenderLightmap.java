@@ -1,16 +1,16 @@
 package mchorse.mclib.client.render;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.Identifier;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.client.render.model.Model;
-import net.minecraft.entity.living.LivingEntity;
-import net.minecraft.resource.Identifier;
+import net.minecraft.entity.LivingEntity;
 
-public class RenderLightmap extends LivingEntityRenderer<LivingEntity, Model<LivingEntity>> {
+public class RenderLightmap extends LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>> {
 
 	public static void create() {
-		new RenderLightmap(Minecraft.getInstance().getEntityRenderDispatcher(), null, 0.0f);
+		new RenderLightmap(MinecraftClient.getInstance().getEntityRenderManager(), null, 0.0f);
 	}
 
 	public static boolean canRenderNamePlate(LivingEntity livingBase) {
@@ -27,7 +27,7 @@ public class RenderLightmap extends LivingEntityRenderer<LivingEntity, Model<Liv
 	public static void renderNameplate(LivingEntity livingBase, String name, double x, double y, double z) {
 	}
 
-	public RenderLightmap(EntityRenderDispatcher dispatcher, Model<LivingEntity> model, float shadowSize) {
+	public RenderLightmap(EntityRenderDispatcher dispatcher, EntityModel<LivingEntity> model, float shadowSize) {
 		super(dispatcher, model, shadowSize);
 	}
 
@@ -37,7 +37,7 @@ public class RenderLightmap extends LivingEntityRenderer<LivingEntity, Model<Liv
 	}
 
 	@Override
-	public Identifier getTextureLocation(LivingEntity entity) {
+	public Identifier getTexture(LivingEntity entity) {
 		return null;
 	}
 }

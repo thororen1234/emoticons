@@ -86,7 +86,7 @@ public final class EmoteCatalog {
 			return;
 		for (File file : files) {
 			try (Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
-				for (Map.Entry<String, JsonElement> entry : JsonParser.parseReader(reader).getAsJsonObject()
+				for (Map.Entry<String, JsonElement> entry : new JsonParser().parse(reader).getAsJsonObject()
 						.entrySet()) {
 					JsonObject info = entry.getValue().getAsJsonObject();
 					int duration = info.has("duration") ? info.get("duration").getAsInt() : 1200;

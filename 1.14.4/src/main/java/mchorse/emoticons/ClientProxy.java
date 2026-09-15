@@ -15,6 +15,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import net.minecraft.client.MinecraftClient;
 
 public class ClientProxy {
 	public static File configFolder;
@@ -28,7 +29,7 @@ public class ClientProxy {
 		EmoteKeys saved = EmoteKeys.fromFile(new File(configFolder, "keys.json"));
 		if (saved == null) {
 			// Preserve preferences from the earlier unfinished port.
-			saved = EmoteKeys.fromFile(new File(net.minecraft.client.Minecraft.getInstance().gameDir,
+			saved = EmoteKeys.fromFile(new File(MinecraftClient.getInstance().runDirectory,
 					"cheatbreaker/emoticons/keys.json"));
 		}
 		if (saved != null)
@@ -94,7 +95,7 @@ public class ClientProxy {
 							continue;
 						try (Reader reader = new InputStreamReader(new FileInputStream(metadata),
 								StandardCharsets.UTF_8)) {
-							JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
+							JsonObject json = new JsonParser().parse(reader).getAsJsonObject();
 							for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
 								BOBJAction action = data.actions.get("emote_" + entry.getKey());
 								if (action == null || !entry.getValue().isJsonObject())

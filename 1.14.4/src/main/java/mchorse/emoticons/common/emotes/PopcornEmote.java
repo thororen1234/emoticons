@@ -4,9 +4,8 @@ import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.client.particles.PopcornParticle;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJBone;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.living.LivingEntity;
-
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.LivingEntity;
 import javax.vecmath.Vector4f;
 
 public class PopcornEmote extends Emote {
@@ -22,7 +21,7 @@ public class PopcornEmote extends Emote {
 
 			for (int i = 0; i < 15; ++i) {
 				PopcornParticle particle = new PopcornParticle(livingBase.world, position.x, position.y, position.z, 0.1);
-				Minecraft.getInstance().particleManager.add(particle);
+				MinecraftClient.getInstance().particleManager.addParticle(particle);
 			}
 		}
 	}

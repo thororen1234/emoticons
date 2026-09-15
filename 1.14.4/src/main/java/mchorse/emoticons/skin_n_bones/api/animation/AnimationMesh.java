@@ -3,10 +3,10 @@ package mchorse.emoticons.skin_n_bones.api.animation;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJBone;
 import mchorse.emoticons.skin_n_bones.api.bobj.CompiledData;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.util.Identifier;
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.Lighting;
-import net.minecraft.resource.Identifier;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -147,7 +147,7 @@ public class AnimationMesh {
 		GL15.glBufferData(34962, this.normals, 35048);
 	}
 
-	public void render(final Minecraft minecraft, final AnimationMeshConfig AnimationMeshConfig) {
+	public void render(final MinecraftClient minecraft, final AnimationMeshConfig AnimationMeshConfig) {
 		if (AnimationMeshConfig != null && !AnimationMeshConfig.visible) {
 			return;
 		}
@@ -156,8 +156,8 @@ public class AnimationMesh {
 		final boolean b2 = AnimationMeshConfig != null && AnimationMeshConfig.normals;
 		final boolean b3 = AnimationMeshConfig == null || AnimationMeshConfig.lighting;
 		if (texture != null) {
-			GlStateManager.enableBoundTexture();
-			minecraft.getTextureManager().bind(texture);
+			GlStateManager.enableTexture();
+			minecraft.getTextureManager().bindTexture(texture);
 			if (AnimationMeshConfig != null) {
 				this.setFiltering(AnimationMeshConfig.filtering);
 			}
@@ -166,13 +166,13 @@ public class AnimationMesh {
 			GL11.glShadeModel(7425);
 		}
 		if (!b2) {
-			Lighting.turnOff();
+			DiffuseLighting.disable();
 		}
 		if (!b3) {
 			// OpenGlHelper.setLightmapTextureCoords(33985, 240.0f, 240.0f);
 		}
 		final int n = (AnimationMeshConfig != null) ? AnimationMeshConfig.color : 16777215;
-		GlStateManager.color((n >> 16 & 0xFF) / 255.0f,  (n >> 8 & 0xFF) / 255.0f,  (n & 0xFF) / 255.0f, 1.0f);
+		GlStateManager.color4f((n >> 16 & 0xFF) / 255.0f,  (n >> 8 & 0xFF) / 255.0f,  (n & 0xFF) / 255.0f, 1.0f);
 
 		GlStateManager.enableRescaleNormal();
 		GL15.glBindBuffer(34962, this.vertexBuffer);
@@ -208,7 +208,7 @@ public class AnimationMesh {
 			GL11.glShadeModel(7424);
 		}
 		if (!b2) {
-			Lighting.turnOn();
+			DiffuseLighting.enable();
 		}
 		if (!b3) {
 			// OpenGlHelper.setLightmapTextureCoords(33985, prevLightmapS, prevLightmapT);
@@ -218,8 +218,8 @@ public class AnimationMesh {
 		GlStateManager.blendFunc(770, 771);
 		if (minecraft.options.debugEnabled && !minecraft.options.reducedDebugInfo) {
 			GlStateManager.disableLighting();
-			GlStateManager.disableDepth();
-			GlStateManager.disableBoundTexture();
+			GlStateManager.disableDepthTest();
+			GlStateManager.disableTexture();
 			for (final BOBJBone BOBJBone : this.data.mesh.armature.orderedBones) {
 				final Vector4f vec = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
 				final Vector4f vec2 = new Vector4f(0.0f, BOBJBone.length, 0.0f, 1.0f);
@@ -234,37 +234,37 @@ public class AnimationMesh {
 				boneMatrix.transform(vec5);
 				GL11.glPointSize(5.0f);
 				GL11.glBegin(0);
-				GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+				GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 				GL11.glVertex3f(vec.x, vec.y, vec.z);
 				GL11.glEnd();
 				GL11.glLineWidth(1.0f);
 				GL11.glBegin(1);
-				GlStateManager.color(0.9f,  0.9f,  0.9f, 1.0f);
+				GlStateManager.color4f(0.9f,  0.9f,  0.9f, 1.0f);
 				GL11.glVertex3f(vec.x, vec.y, vec.z);
 				GL11.glVertex3f(vec2.x, vec2.y, vec2.z);
 				GL11.glEnd();
 				GL11.glLineWidth(2.0f);
 				GL11.glBegin(1);
-				GlStateManager.color(1.0f,  0.0f,  0.0f, 1.0f);
+				GlStateManager.color4f(1.0f,  0.0f,  0.0f, 1.0f);
 				GL11.glVertex3f(vec.x, vec.y, vec.z);
 				GL11.glVertex3f(vec3.x, vec3.y, vec3.z);
 				GL11.glEnd();
 				GL11.glBegin(1);
-				GlStateManager.color(0.0f,  1.0f,  0.0f, 1.0f);
+				GlStateManager.color4f(0.0f,  1.0f,  0.0f, 1.0f);
 				GL11.glVertex3f(vec.x, vec.y, vec.z);
 				GL11.glVertex3f(vec4.x, vec4.y, vec4.z);
 				GL11.glEnd();
 				GL11.glBegin(1);
-				GlStateManager.color(0.0f, 0.0f, 1.0f, 1.0f);
+				GlStateManager.color4f(0.0f, 0.0f, 1.0f, 1.0f);
 				GL11.glVertex3f(vec.x, vec.y, vec.z);
 				GL11.glVertex3f(vec5.x, vec5.y, vec5.z);
 				GL11.glEnd();
 			}
-			GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 			GL11.glLineWidth(1.0f);
-			GlStateManager.enableDepth();
+			GlStateManager.enableDepthTest();
 			GlStateManager.enableLighting();
-			GlStateManager.enableBoundTexture();
+			GlStateManager.enableTexture();
 		}
 	}
 

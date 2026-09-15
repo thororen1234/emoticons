@@ -1,14 +1,13 @@
 package mchorse.emoticons.skin_n_bones.api.animation;
 
 import com.google.common.collect.ImmutableSet;
-
-import net.minecraft.resource.Identifier;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.awt.image.BufferedImage;
 import java.util.Set;
+import net.minecraft.util.Identifier;
 
 public class AnimationPack {
 	public static Set<String> DOMAINS = ImmutableSet.of("s&b");

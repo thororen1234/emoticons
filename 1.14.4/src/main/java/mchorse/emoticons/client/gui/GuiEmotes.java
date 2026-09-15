@@ -9,18 +9,20 @@ import mchorse.emoticons.capabilities.cosmetic.ICosmetic;
 import mchorse.emoticons.client.EmoteKeys;
 import mchorse.emoticons.common.emotes.Emote;
 import mchorse.emoticons.common.emotes.Emotes;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiElement;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.DiffuseLighting;
+import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.Lighting;
-import net.minecraft.entity.living.player.PlayerEntity;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.text.LiteralText;
+import net.minecraft.util.Identifier;
 
 public class GuiEmotes extends Screen {
 
@@ -38,7 +40,7 @@ public class GuiEmotes extends Screen {
 	private int selectedIndex = -1;
 	private int slotIndex = 0;
 
-	private List<ButtonWidget> slotButtons = new ArrayList<>();
+	private List<AbstractButtonWidget> slotButtons = new ArrayList<>();
 	private String searchText = "";
 	private boolean searchFocused = false;
 
@@ -47,8 +49,8 @@ public class GuiEmotes extends Screen {
 	private int lastMouseX = 0;
 
 	public GuiEmotes() {
-		super(new net.minecraft.text.LiteralText(""));
-		Minecraft mc = Minecraft.getInstance();
+		super(new LiteralText(""));
+		MinecraftClient mc = MinecraftClient.getInstance();
 		this.keys = ClientProxy.keys;
 
 		PlayerEntity player = mc.player;
@@ -68,9 +70,9 @@ public class GuiEmotes extends Screen {
 			// fetchAnimation makes an independent copy for the preview.
 
 			// Apply actual player skin to preview
-			if (player instanceof net.minecraft.client.entity.living.player.ClientPlayerEntity) {
-				net.minecraft.resource.Identifier skinTex =
-						((net.minecraft.client.entity.living.player.ClientPlayerEntity) player).getSkinTextureLocation();
+			if (player instanceof AbstractClientPlayerEntity) {
+				Identifier skinTex =
+						((AbstractClientPlayerEntity) player).getSkinTexture();
 				if (this.controller.userConfig != null && this.controller.userConfig.meshes.containsKey("body")) {
 					this.controller.userConfig.meshes.get("body").texture = skinTex;
 				}
@@ -89,17 +91,17 @@ public class GuiEmotes extends Screen {
 		this.slotButtons.clear();
 		this.buttons.clear();
 
-		this.buttons.add(new ButtonWidget(LIST_WIDTH + 5, 34, 60, 20, "Play") {
+		this.buttons.add(new AbstractButtonWidget(LIST_WIDTH + 5, 34, 60, 20, "Play") {
 			@Override
-			public void m_15978786(double mouseX, double mouseY) {
-				super.m_15978786(mouseX, mouseY);
+			public void onClick(double mouseX, double mouseY) {
+				super.onClick(mouseX, mouseY);
 				handleButtonClick(this);
 			}
 		});
-		this.buttons.add(new ButtonWidget(LIST_WIDTH + 68, 34, 40, 20, "Stop") {
+		this.buttons.add(new AbstractButtonWidget(LIST_WIDTH + 68, 34, 40, 20, "Stop") {
 			@Override
-			public void m_15978786(double mouseX, double mouseY) {
-				super.m_15978786(mouseX, mouseY);
+			public void onClick(double mouseX, double mouseY) {
+				super.onClick(mouseX, mouseY);
 				handleButtonClick(this);
 			}
 		});
@@ -110,10 +112,10 @@ public class GuiEmotes extends Screen {
 			String emoteName = this.keys.emotes.get(i);
 			String label = (i + 1) + ": " + formatEmoteName(emoteName);
 			int btnX = LIST_WIDTH + 5 + i * (btnW + 5);
-			ButtonWidget btn = new ButtonWidget(btnX, btnY, btnW, BTN_HEIGHT, label) {
+			AbstractButtonWidget btn = new AbstractButtonWidget(btnX, btnY, btnW, BTN_HEIGHT, label) {
 				@Override
-				public void m_15978786(double mouseX, double mouseY) {
-					super.m_15978786(mouseX, mouseY);
+				public void onClick(double mouseX, double mouseY) {
+					super.onClick(mouseX, mouseY);
 					handleButtonClick(this);
 				}
 			};
@@ -122,7 +124,7 @@ public class GuiEmotes extends Screen {
 		}
 	}
 
-	protected void handleButtonClick(ButtonWidget button) {
+	protected void handleButtonClick(AbstractButtonWidget button) {
 		int id = slotButtons.indexOf(button);
 		if (id != -1) {
 			this.slotIndex = id;
@@ -133,7 +135,7 @@ public class GuiEmotes extends Screen {
 	@Override
 	public void tick() {
 		if (this.controller != null) {
-			this.controller.update(Minecraft.getInstance().player);
+			this.controller.update(MinecraftClient.getInstance().player);
 		}
 	}
 
@@ -141,19 +143,19 @@ public class GuiEmotes extends Screen {
 	public void render(int mouseX, int mouseY, float partialTicks) {
 		this.renderBackground();
 
-		Minecraft mc = Minecraft.getInstance();
+		MinecraftClient mc = MinecraftClient.getInstance();
 		int listH = this.height - BOTTOM_HEIGHT - 32;
 		int rowH = 12;
 		int visibleRows = listH / rowH;
 		int startY = 32;
 
 		// Left panel
-		GuiElement.fill(0, 0, LIST_WIDTH, this.height, 0xCC000000);
-		this.textRenderer.drawWithShadow("Search:", 5, 5, 0xAAAAAA);
-		GuiElement.fill(5, 15, LIST_WIDTH - 5, 29, 0xFF555555);
-		GuiElement.fill(6, 16, LIST_WIDTH - 6, 28, 0xFF222222);
+		DrawableHelper.fill(0, 0, LIST_WIDTH, this.height, 0xCC000000);
+		this.font.drawWithShadow("Search:", 5, 5, 0xAAAAAA);
+		DrawableHelper.fill(5, 15, LIST_WIDTH - 5, 29, 0xFF555555);
+		DrawableHelper.fill(6, 16, LIST_WIDTH - 6, 28, 0xFF222222);
 		String displaySearch = searchText + (searchFocused ? "|" : "");
-		this.textRenderer.drawWithShadow(displaySearch, 8, 18, 0xFFFFFF);
+		this.font.drawWithShadow(displaySearch, 8, 18, 0xFFFFFF);
 
 		for (int i = 0; i < visibleRows; i++) {
 			int idx = i + scrollOffset;
@@ -162,19 +164,19 @@ public class GuiEmotes extends Screen {
 			boolean isSelected = (idx == selectedIndex);
 			boolean isHovered = mouseX < LIST_WIDTH && mouseY >= startY + i * rowH && mouseY < startY + (i + 1) * rowH;
 			int bg = isSelected ? 0xFF4444AA : (isHovered ? 0xFF333355 : 0x00000000);
-			if (bg != 0) GuiElement.fill(0, startY + i * rowH, LIST_WIDTH, startY + (i + 1) * rowH, bg);
-			this.textRenderer.drawWithShadow(formatEmoteName(key), 5, startY + i * rowH + 2, isSelected ? 0xFFFFFF : 0xCCCCCC);
+			if (bg != 0) DrawableHelper.fill(0, startY + i * rowH, LIST_WIDTH, startY + (i + 1) * rowH, bg);
+			this.font.drawWithShadow(formatEmoteName(key), 5, startY + i * rowH + 2, isSelected ? 0xFFFFFF : 0xCCCCCC);
 		}
 
 		if (filteredKeys.size() > visibleRows) {
 			int scrollH = Math.max(10, (int) ((float) visibleRows / filteredKeys.size() * listH));
 			int scrollY = startY + (int) ((float) scrollOffset / Math.max(1, filteredKeys.size() - visibleRows) * (listH - scrollH));
-			GuiElement.fill(LIST_WIDTH - 4, scrollY, LIST_WIDTH - 1, scrollY + scrollH, 0xFF888888);
+			DrawableHelper.fill(LIST_WIDTH - 4, scrollY, LIST_WIDTH - 1, scrollY + scrollH, 0xFF888888);
 		}
 
 		// Bottom bar
 		this.fillGradient(LIST_WIDTH, this.height - BOTTOM_HEIGHT - 20, this.width, this.height - BOTTOM_HEIGHT, 0x00000000, 0x88000000);
-		GuiElement.fill(LIST_WIDTH, this.height - BOTTOM_HEIGHT, this.width, this.height, 0x99000000);
+		DrawableHelper.fill(LIST_WIDTH, this.height - BOTTOM_HEIGHT, this.width, this.height, 0x99000000);
 
 		// Model preview
 		if (this.controller != null && this.controller.animation != null) {
@@ -193,11 +195,11 @@ public class GuiEmotes extends Screen {
 		if (selectedIndex >= 0 && selectedIndex < filteredKeys.size()) {
 			String name = formatEmoteName(filteredKeys.get(selectedIndex));
 			int cx = LIST_WIDTH + (this.width - LIST_WIDTH) / 2;
-			int nameW = this.textRenderer.getWidth(name);
+			int nameW = this.font.getStringWidth(name);
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(cx - nameW, this.height - BOTTOM_HEIGHT - 32, 0);
-			GlStateManager.scale(2.0f, 2.0f, 2.0f);
-			this.textRenderer.drawWithShadow(name, 0, 0, 0xFFFFFF);
+			GlStateManager.translatef(cx - nameW, this.height - BOTTOM_HEIGHT - 32, 0);
+			GlStateManager.scalef(2.0f, 2.0f, 2.0f);
+			this.font.drawWithShadow(name, 0, 0, 0xFFFFFF);
 			GlStateManager.popMatrix();
 		}
 
@@ -205,30 +207,30 @@ public class GuiEmotes extends Screen {
 		this.fillGradient(LIST_WIDTH, 0, this.width, 32, 0x88000000, 0x00000000);
 		String title = "Emotes ";
 		String subtitle = "(" + Emotes.EMOTES.size() + " total)";
-		this.textRenderer.drawWithShadow(title, LIST_WIDTH + 5, 10, 0xFFFFFF);
-		this.textRenderer.drawWithShadow(subtitle, LIST_WIDTH + 5 + this.textRenderer.getWidth(title), 10, 0xAAAAAA);
+		this.font.drawWithShadow(title, LIST_WIDTH + 5, 10, 0xFFFFFF);
+		this.font.drawWithShadow(subtitle, LIST_WIDTH + 5 + this.font.getStringWidth(title), 10, 0xAAAAAA);
 
 		// Slot label
-		this.textRenderer.drawWithShadow("Editing slot: " + (slotIndex + 1), LIST_WIDTH + 5, this.height - BOTTOM_HEIGHT + 5, 0xAAAAAA);
+		this.font.drawWithShadow("Editing slot: " + (slotIndex + 1), LIST_WIDTH + 5, this.height - BOTTOM_HEIGHT + 5, 0xAAAAAA);
 
 		super.render(mouseX, mouseY, partialTicks);
 	}
 
-	private void drawModel(Minecraft mc, int x, int y, int scale, float partialTicks) {
-		GlStateManager.enableDepth();
+	private void drawModel(MinecraftClient mc, int x, int y, int scale, float partialTicks) {
+		GlStateManager.enableDepthTest();
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x, y, 100.0f);
-		GlStateManager.scale(-scale, scale, scale);
-		GlStateManager.rotate(180.0f, 0.0f, 0.0f, 1.0f);
-		GlStateManager.rotate(previewRotation, 0.0f, 1.0f, 0.0f);
-		Lighting.turnOn();
+		GlStateManager.translatef(x, y, 100.0f);
+		GlStateManager.scalef(-scale, scale, scale);
+		GlStateManager.rotatef(180.0f, 0.0f, 0.0f, 1.0f);
+		GlStateManager.rotatef(previewRotation, 0.0f, 1.0f, 0.0f);
+		DiffuseLighting.enable();
 		GlStateManager.enableRescaleNormal();
 		GlStateManager.enableColorMaterial();
 		this.controller.render(mc.player, 0, 0, 0, 0.0f, partialTicks);
 		GlStateManager.disableRescaleNormal();
 		GlStateManager.popMatrix();
-		Lighting.turnOff();
-		GlStateManager.disableDepth();
+		DiffuseLighting.disable();
+		GlStateManager.disableDepthTest();
 	}
 
 	@Override
@@ -320,7 +322,7 @@ public class GuiEmotes extends Screen {
 	}
 
 	@Override
-	public boolean shouldPauseGame() {
+	public boolean isPauseScreen() {
 		return false;
 	}
 

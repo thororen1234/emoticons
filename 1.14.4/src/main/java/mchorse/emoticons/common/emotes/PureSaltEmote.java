@@ -4,9 +4,8 @@ import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.client.particles.SaltParticle;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJBone;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.living.LivingEntity;
-
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.LivingEntity;
 import javax.vecmath.Vector4f;
 
 public class PureSaltEmote extends Emote {
@@ -23,7 +22,7 @@ public class PureSaltEmote extends Emote {
 
 			for (int i = 0; i < count; ++i) {
 				SaltParticle particle = new SaltParticle(livingBase.world, position.x, position.y, position.z, 0);
-				Minecraft.getInstance().particleManager.add(particle);
+				MinecraftClient.getInstance().particleManager.addParticle(particle);
 			}
 		}
 	}
