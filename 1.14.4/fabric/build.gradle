@@ -1,18 +1,39 @@
 plugins {
-	id 'maven-publish'
-	id 'fabric-loom' version '1.17-SNAPSHOT'
+	id 'java'
+	id 'xyz.wagyourtail.unimined' version '1.4.1'
 }
+
+group = project.maven_group
+version = "${project.version}+mc${project.minecraft_version}"
 
 base {
 	archivesName = project.archives_base_name
 }
-version = "${project.version}+mc${project.minecraft_version}"
-group = project.maven_group
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+	withSourcesJar()
+}
+
+repositories {
+	mavenCentral()
+}
+
+unimined.minecraft {
+	version project.minecraft_version
+
+	mappings {
+		intermediary()
+		yarn(project.yarn_build as int)
+	}
+
+	fabric {
+		loader project.loader_version
+	}
+}
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_build}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 	implementation 'java3d:vecmath:1.5.2'
 	include 'java3d:vecmath:1.5.2'
@@ -28,24 +49,10 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = 'UTF-8'
-	it.options.compilerArgs.add('-Xlint:-options')
 }
 
-java {
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
-	withSourcesJar()
-}
 jar {
 	from('../LICENSE.txt') {
 		rename { "${it}_${base.archivesName.get()}" }
 	}
-}
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-
 }
