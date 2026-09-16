@@ -51,7 +51,7 @@ public class ActionConfig {
                 this.tick = compound.getInteger("Tick");
             }
         } else if (base instanceof NBTTagString) {
-            this.name = ((NBTTagString) base).func_150285_a_();
+            this.name = ((NBTTagString) base).getString();
         }
     }
 

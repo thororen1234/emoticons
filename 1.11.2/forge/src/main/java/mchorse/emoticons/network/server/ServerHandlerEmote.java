@@ -13,7 +13,7 @@ public class ServerHandlerEmote implements IMessageHandler<PacketEmote, IMessage
     @Override
     public IMessage onMessage(final PacketEmote message, MessageContext ctx)
     {
-        final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+        final EntityPlayerMP player = ctx.getServerHandler().player;
         
         ((net.minecraft.world.WorldServer) player.world).addScheduledTask(new Runnable() {
             @Override

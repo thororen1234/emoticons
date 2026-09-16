@@ -21,7 +21,7 @@ public class AnimatorActionsConfig {
 
     public void fromNBT(final NBTTagCompound NBTTagCompound) {
         this.actions.clear();
-        for (final String s : (Set<String>) NBTTagCompound.func_150296_c()) {
+        for (final String s : (Set<String>) NBTTagCompound.getKeySet()) {
             final NBTBase base = NBTTagCompound.getTag(s);
             final String key = this.toKey(s);
             final ActionConfig config = new ActionConfig(key);

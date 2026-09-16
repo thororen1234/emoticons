@@ -18,7 +18,7 @@ public class RenderLightmap
     }
 
     public static boolean canRenderNamePlate(EntityLivingBase livingBase) {
-        return instance.func_110813_b(livingBase);
+        return instance.canRenderName(livingBase);
     }
 
     public static boolean set(EntityLivingBase livingBase, float partialTicks) {
@@ -32,7 +32,7 @@ public class RenderLightmap
     }
 
     public static void renderNameplate(EntityLivingBase livingBase, String name, double x, double y, double z) {
-        instance.func_147906_a(livingBase, name, x, y, z, 64);
+        instance.renderLivingLabel(livingBase, name, x, y, z, 64);
     }
 
     public RenderLightmap(ModelBase modelBase, float f) {

@@ -25,13 +25,17 @@ public class AnimationPack
     }
 
     @Override
-    public InputStream getInputStream(ResourceLocation location) throws IOException {
+    public InputStream getInputStream(ResourceLocation location) {
         if (this.stream != null) {
             InputStream inputStream = this.stream;
             this.stream = null;
             return inputStream;
         }
-        return new FileInputStream(new File(this.config, location.getResourcePath()));
+        try {
+            return new FileInputStream(new File(this.config, location.getResourcePath()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -50,7 +54,7 @@ public class AnimationPack
     }
 
     @Override
-    public IMetadataSection getPackMetadata(IMetadataSerializer serializer, String string) throws IOException {
+    public IMetadataSection getPackMetadata(IMetadataSerializer serializer, String string) {
         return null;
     }
 

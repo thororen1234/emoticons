@@ -142,11 +142,11 @@ public class GuiEmotes extends GuiScreen {
         int startY = 32;
 
         Gui.drawRect(0, 0, LIST_WIDTH, this.height, 0xCC000000);
-        this.drawString(this.fontRendererObj, "Search:", 5, 5, 0xAAAAAA);
+        this.drawString(this.fontRenderer, "Search:", 5, 5, 0xAAAAAA);
         Gui.drawRect(5, 15, LIST_WIDTH - 5, 29, 0xFF555555);
         Gui.drawRect(6, 16, LIST_WIDTH - 6, 28, 0xFF222222);
         String displaySearch = searchText + (searchFocused ? "_" : "");
-        this.drawString(this.fontRendererObj, displaySearch, 8, 18, 0xFFFFFF);
+        this.drawString(this.fontRenderer, displaySearch, 8, 18, 0xFFFFFF);
 
         for (int i = 0; i < visibleRows; i++) {
             int idx = i + scrollOffset;
@@ -158,7 +158,7 @@ public class GuiEmotes extends GuiScreen {
             int bg = isSelected ? 0xFF4444AA : (isHovered ? 0xFF333355 : 0x00000000);
             if (bg != 0)
                 Gui.drawRect(0, startY + i * rowH, LIST_WIDTH, startY + (i + 1) * rowH, bg);
-            this.drawString(this.fontRendererObj, formatEmoteName(key), 5, startY + i * rowH + 2,
+            this.drawString(this.fontRenderer, formatEmoteName(key), 5, startY + i * rowH + 2,
                     isSelected ? 0xFFFFFF : 0xCCCCCC);
         }
 
@@ -191,21 +191,21 @@ public class GuiEmotes extends GuiScreen {
         if (selectedIndex >= 0 && selectedIndex < filteredKeys.size()) {
             String name = formatEmoteName(filteredKeys.get(selectedIndex));
             int cx = LIST_WIDTH + (this.width - LIST_WIDTH) / 2;
-            int nameW = this.fontRendererObj.getStringWidth(name);
+            int nameW = this.fontRenderer.getStringWidth(name);
             GL11.glPushMatrix();
             GL11.glTranslatef(cx - nameW, this.height - BOTTOM_HEIGHT - 32, 0);
             GL11.glScalef(2.0f, 2.0f, 2.0f);
-            this.drawString(this.fontRendererObj, name, 0, 0, 0xFFFFFF);
+            this.drawString(this.fontRenderer, name, 0, 0, 0xFFFFFF);
             GL11.glPopMatrix();
         }
 
         this.drawGradientRect(LIST_WIDTH, 0, this.width, 32, 0x88000000, 0x00000000);
         String title = "Emotes ";
         String subtitle = "(" + Emotes.EMOTES.size() + " total)";
-        this.drawString(this.fontRendererObj, title, LIST_WIDTH + 5, 10, 0xFFFFFF);
-        this.drawString(this.fontRendererObj, subtitle, LIST_WIDTH + 5 + this.fontRendererObj.getStringWidth(title), 10, 0xAAAAAA);
+        this.drawString(this.fontRenderer, title, LIST_WIDTH + 5, 10, 0xFFFFFF);
+        this.drawString(this.fontRenderer, subtitle, LIST_WIDTH + 5 + this.fontRenderer.getStringWidth(title), 10, 0xAAAAAA);
 
-        this.drawString(this.fontRendererObj, "Editing slot: " + (slotIndex + 1), LIST_WIDTH + 5,
+        this.drawString(this.fontRenderer, "Editing slot: " + (slotIndex + 1), LIST_WIDTH + 5,
                 this.height - BOTTOM_HEIGHT + 5, 0xAAAAAA);
 
         super.drawScreen(mouseX, mouseY, partialTicks);

@@ -89,7 +89,7 @@ public class AnimatorConfig {
         }
         if (NBTTagCompound.hasKey("Meshes")) {
             final NBTTagCompound meshesCompound = NBTTagCompound.getCompoundTag("Meshes");
-            for (final String s : (Set<String>) meshesCompound.func_150296_c()) {
+            for (final String s : (Set<String>) meshesCompound.getKeySet()) {
                 final NBTBase mesh = meshesCompound.getTag(s);
                 AnimationMeshConfig AnimationMeshConfig = this.meshes.get(s);
                 if (AnimationMeshConfig == null) {
@@ -152,7 +152,7 @@ public class AnimatorConfig {
             }
         } else if (base instanceof NBTTagCompound) {
             final NBTTagCompound NBTTagCompound = (NBTTagCompound) base;
-            for (final String s : (Set<String>) NBTTagCompound.func_150296_c()) {
+            for (final String s : (Set<String>) NBTTagCompound.getKeySet()) {
                 AnimatorHeldItemConfig config = map.get(s);
                 if (config == null) {
                     map.put(s, config = new AnimatorHeldItemConfig(s));

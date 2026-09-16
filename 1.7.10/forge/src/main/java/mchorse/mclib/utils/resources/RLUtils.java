@@ -73,7 +73,7 @@ public class RLUtils {
                 return multi;
             }
         } else if (NBTBase instanceof NBTTagString) {
-            return create(((NBTTagString) NBTBase).func_150285_a_());
+            return create(((NBTTagString) NBTBase).getString());
         }
         return null;
     }
