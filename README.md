@@ -4,7 +4,9 @@
 
 Original Author: [mchorse](https://github.com/mchorse)
 
-Versions supported by branch:
+Built with [Unimined](https://github.com/unimined/unimined), one Gradle project covering every version/loader combination below, laid out as `<version>/<loader>/`.
+
+You can viwe the unimined source on the unimined branch 
 
 ## Supported Versions
 
@@ -14,7 +16,7 @@ Versions supported by branch:
 | 1.13.2  |   ❌  |   ❌   |   ❌  |    ✅   |
 | 1.12.2  |   ✅  |   ❌   |   ❌  |    ✅   |
 | 1.11.2  |   ❌  |   ❌   |   ❌  |    ✅   |
-| 1.10.2  |   ❌  |   ❌   |   ❌  |    ✅   |
-| 1.9.4   |   ❌  |   ❌   |   ❌  |    ✅   |
+| 1.10.2  |   ✅  |   ❌   |   ❌  |    ✅   |
+| 1.9.4   |   ✅  |   ❌   |   ❌  |    ✅   |
 | 1.8.9   |   ✅  |   ❌   |   ❌  |    ✅   |
 | 1.7.10  |   ✅  |   ❌   |   ❌  |    ✅   |
