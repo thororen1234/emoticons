@@ -1,5 +1,5 @@
 task buildAll {
     group = 'build'
     description = 'Builds every supported version/loader project.'
-    dependsOn ':1.7.10:forge:build', ':1.8.9:forge:build', ':1.9.4:forge:build', ':1.10.2:forge:build', ':1.12.2:forge:build'
+    dependsOn ':1.7.10:forge:build', ':1.7.10:ornithe:build', ':1.8.9:forge:build', ':1.8.9:ornithe:build', ':1.9.4:forge:build', ':1.9.4:ornithe:build', ':1.10.2:forge:build', ':1.10.2:ornithe:build', ':1.11.2:ornithe:build', ':1.12.2:forge:build', ':1.12.2:ornithe:build', ':1.13.2:ornithe:build', ':1.14.4:fabric:build', ':1.14.4:ornithe:build'
 }
