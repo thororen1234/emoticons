@@ -17,6 +17,7 @@ import net.minecraft.client.options.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import org.lwjgl.glfw.GLFW;
 
 public class KeyboardHandler {
 	public static KeyBinding random;
@@ -33,15 +34,17 @@ public class KeyboardHandler {
 	public static void init() {
 		String pre = "emoticons.keys.";
 
-		int KEY_O = 24;
-		int KEY_NUMPAD1 = 79;
-		int KEY_NUMPAD2 = 80;
-		int KEY_NUMPAD3 = 81;
-		int KEY_NUMPAD4 = 75;
-		int KEY_NUMPAD5 = 76;
-		int KEY_NUMPAD6 = 77;
-		int KEY_P = 25;
-		int KEY_NONE = 0;
+		// NOTE: KeyBinding takes a raw GLFW key token here (not a legacy LWJGL2
+		// org.lwjgl.input.Keyboard scancode, which used a different numbering scheme).
+		int KEY_O = GLFW.GLFW_KEY_O;
+		int KEY_NUMPAD1 = GLFW.GLFW_KEY_KP_1;
+		int KEY_NUMPAD2 = GLFW.GLFW_KEY_KP_2;
+		int KEY_NUMPAD3 = GLFW.GLFW_KEY_KP_3;
+		int KEY_NUMPAD4 = GLFW.GLFW_KEY_KP_4;
+		int KEY_NUMPAD5 = GLFW.GLFW_KEY_KP_5;
+		int KEY_NUMPAD6 = GLFW.GLFW_KEY_KP_6;
+		int KEY_P = GLFW.GLFW_KEY_P;
+		int KEY_NONE = GLFW.GLFW_KEY_UNKNOWN;
 
 		random = new KeyBinding(pre + "random", KEY_O, pre + "category");
 		emote1 = new KeyBinding(pre + "emote1", KEY_NUMPAD1, pre + "category");
