@@ -28,7 +28,6 @@ unimined.minecraft {
 
     mappings {
         searge()
-        mcp("stable", "12-1.7.10")
     }
 
     minecraftForge {
