@@ -4,6 +4,8 @@
 
 Original Author: [mchorse](https://github.com/mchorse)
 
+Built with [Unimined](https://github.com/unimined/unimined), one Gradle project covering every version/loader combination below, laid out as `<version>/<loader>/`.
+
 ## Supported Versions
 
 | Version | Forge | Fabric | Quilt | Ornithe |

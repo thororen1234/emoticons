@@ -1,86 +1,49 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven { url = 'http://files.minecraftforge.net/maven' }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
-    }
+plugins {
+    id 'java'
+    id 'xyz.wagyourtail.unimined' version '1.4.1'
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-
-version = project.mod_version
 group = 'mchorse.emoticons'
-archivesBaseName = 'emoticons'
-sourceCompatibility = targetCompatibility = '1.8'
+version = project.mod_version
 
-minecraft {
-    version = '1.8.9-11.15.1.2318-1.8.9'
-    runDir = 'run'
-    mappings = 'stable_22'
+base {
+    archivesName = 'emoticons'
 }
 
-/* ForgeGradle 2.1 uses a retired HTTP asset host. Populate its normal cache
- * from Mojang's HTTPS CDN before its legacy asset task attempts any requests. */
-tasks.getAssets.doFirst {
-    def assetsDir = tasks.getAssets.assetsDir
-    def indexFile = tasks.getAssets.assetsIndex
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
-    if (!indexFile.isFile()) {
-        throw new GradleException("Missing Minecraft asset index: ${indexFile}")
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+unimined.minecraft {
+    version "1.8.9"
+
+    mappings {
+        searge()
+        mcp("stable", "22-1.8.9")
     }
 
-    def assetIndex = new groovy.json.JsonSlurper().parse(indexFile)
-
-    assetIndex.objects.each { name, metadata ->
-        String hash = metadata.hash
-        File destination = new File(assetsDir, "objects/${hash.substring(0, 2)}/${hash}")
-
-        if (destination.isFile() && destination.length() == metadata.size) {
-            return
-        }
-
-        destination.parentFile.mkdirs()
-        File temporary = File.createTempFile(hash, '.part', destination.parentFile)
-
-        try {
-            URLConnection connection = new URL("https://resources.download.minecraft.net/${hash.substring(0, 2)}/${hash}").openConnection()
-            connection.connectTimeout = 30000
-            connection.readTimeout = 30000
-
-            connection.inputStream.withCloseable { input ->
-                temporary.withOutputStream { output -> output << input }
-            }
-
-            if (temporary.length() != metadata.size) {
-                throw new GradleException("Incomplete Minecraft asset download: ${name}")
-            }
-
-            if (destination.exists() && !destination.delete()) {
-                throw new GradleException("Couldn't replace Minecraft asset: ${destination}")
-            }
-
-            if (!temporary.renameTo(destination)) {
-                throw new GradleException("Couldn't store Minecraft asset: ${destination}")
-            }
-        } finally {
-            if (temporary.exists()) {
-                temporary.delete()
-            }
-        }
+    minecraftForge {
+        loader "11.15.1.2318-1.8.9"
     }
+}
+
+dependencies {
 }
 
 processResources {
-    inputs.property 'version', project.version
-    inputs.property 'mcversion', project.minecraft.version
+    inputs.property "version", project.version
+    inputs.property "mcversion", "1.8.9"
 
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version
-    }
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+    filesMatching("mcmod.info") {
+        expand "version": project.version, "mcversion": "1.8.9"
     }
 }

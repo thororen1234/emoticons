@@ -1,157 +1,49 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven { url = 'http://files.minecraftforge.net/maven' }
-    }
-    dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
-    }
+plugins {
+    id 'java'
+    id 'xyz.wagyourtail.unimined' version '1.4.1'
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-
-version = project.mod_version
 group = 'mchorse.emoticons'
-archivesBaseName = 'emoticons'
-sourceCompatibility = targetCompatibility = '1.8'
+version = project.mod_version
 
-minecraft {
-    version = '1.9.4-12.17.0.2317-1.9.4'
-    runDir = 'run'
-    mappings = 'stable_26'
+base {
+    archivesName = 'emoticons'
 }
 
-/* ForgeGradle 2.1 uses a retired HTTP asset host. Populate its normal cache
- * from Mojang's HTTPS CDN before its legacy asset task attempts any requests. */
-tasks.getAssets.doFirst {
-    def assetsDir = tasks.getAssets.assetsDir
-    def indexFile = tasks.getAssets.assetsIndex
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
-    if (!indexFile.isFile()) {
-        throw new GradleException("Missing Minecraft asset index: ${indexFile}")
-    }
-
-    def assetIndex = new groovy.json.JsonSlurper().parse(indexFile)
-
-    assetIndex.objects.each { name, metadata ->
-        String hash = metadata.hash
-        File destination = new File(assetsDir, "objects/${hash.substring(0, 2)}/${hash}")
-
-        if (destination.isFile() && destination.length() == metadata.size) {
-            return
-        }
-
-        destination.parentFile.mkdirs()
-        File temporary = File.createTempFile(hash, '.part', destination.parentFile)
-
-        try {
-            URLConnection connection = new URL("https://resources.download.minecraft.net/${hash.substring(0, 2)}/${hash}").openConnection()
-            connection.connectTimeout = 30000
-            connection.readTimeout = 30000
-
-            connection.inputStream.withCloseable { input ->
-                temporary.withOutputStream { output -> output << input }
-            }
-
-            if (temporary.length() != metadata.size) {
-                throw new GradleException("Incomplete Minecraft asset download: ${name}")
-            }
-
-            if (destination.exists() && !destination.delete()) {
-                throw new GradleException("Couldn't replace Minecraft asset: ${destination}")
-            }
-
-            if (!temporary.renameTo(destination)) {
-                throw new GradleException("Couldn't store Minecraft asset: ${destination}")
-            }
-        } finally {
-            if (temporary.exists()) {
-                temporary.delete()
-            }
-        }
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
     }
 }
 
-ext.stripFastutilSideOnly = { File jar ->
-    if (jar == null || !jar.isFile()) {
-        return
-    }
-
-    String sideOnlyDesc = 'Lnet/minecraftforge/fml/relauncher/SideOnly;'
-    boolean dirty = false
-
-    new java.util.zip.ZipFile(jar).withCloseable { zf ->
-        dirty = zf.entries().any { entry ->
-            entry.name.startsWith('it/unimi/dsi/fastutil/') && entry.name.endsWith('.class') &&
-                    new String(zf.getInputStream(entry).bytes, 'ISO-8859-1').contains(sideOnlyDesc)
-        }
-    }
-
-    if (!dirty) {
-        return
-    }
-
-    logger.lifecycle("Stripping bogus @SideOnly annotations from fastutil classes in ${jar}")
-    File tempJar = File.createTempFile(jar.name, '.part', jar.parentFile)
-
-    new java.util.zip.ZipOutputStream(new FileOutputStream(tempJar)).withCloseable { zos ->
-        new java.util.zip.ZipFile(jar).withCloseable { zf ->
-            zf.entries().each { entry ->
-                if (entry.isDirectory()) {
-                    return
-                }
-
-                byte[] bytes = zf.getInputStream(entry).bytes
-
-                if (entry.name.startsWith('it/unimi/dsi/fastutil/') && entry.name.endsWith('.class')) {
-                    org.objectweb.asm.ClassReader reader = new org.objectweb.asm.ClassReader(bytes)
-                    org.objectweb.asm.ClassWriter writer = new org.objectweb.asm.ClassWriter(reader, 0)
-                    org.objectweb.asm.ClassVisitor stripper = new org.objectweb.asm.ClassVisitor(org.objectweb.asm.Opcodes.ASM5, writer) {
-                        @Override
-                        org.objectweb.asm.AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-                            return desc == sideOnlyDesc ? null : super.visitAnnotation(desc, visible)
-                        }
-                    }
-                    reader.accept(stripper, 0)
-                    bytes = writer.toByteArray()
-                }
-
-                zos.putNextEntry(new java.util.zip.ZipEntry(entry.name))
-                zos.write(bytes)
-                zos.closeEntry()
-            }
-        }
-    }
-
-    jar.delete()
-    tempJar.renameTo(jar)
+repositories {
+    mavenCentral()
 }
 
-tasks.deobfMcMCP.doLast {
-    stripFastutilSideOnly(tasks.deobfMcMCP.outJar)
+unimined.minecraft {
+    version "1.9.4"
+
+    mappings {
+        searge()
+        mcp("stable", "26-1.9.4")
+    }
+
+    minecraftForge {
+        loader "12.17.0.2317-1.9.4"
+    }
 }
 
-compileJava.doFirst {
-    stripFastutilSideOnly(tasks.deobfMcMCP.outJar)
-}
-
-runClient.doFirst {
-    stripFastutilSideOnly(tasks.deobfMcMCP.outJar)
-}
-
-runServer.doFirst {
-    stripFastutilSideOnly(tasks.deobfMcMCP.outJar)
+dependencies {
 }
 
 processResources {
-    inputs.property 'version', project.version
-    inputs.property 'mcversion', project.minecraft.version
+    inputs.property "version", project.version
+    inputs.property "mcversion", "1.9.4"
 
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version
-    }
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+    filesMatching("mcmod.info") {
+        expand "version": project.version, "mcversion": "1.9.4"
     }
 }
