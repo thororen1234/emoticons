@@ -10,7 +10,7 @@ Built with [Unimined](https://github.com/unimined/unimined), one Gradle project 
 
 | Version | NeoForge | Forge | Fabric | Quilt | Ornithe |
 | ------- | :------: | :---: | :----: | :---: | :-----: |
-| 1.14.4  |    ❌    |  ❌   |   ✅   |  ❌   |    ✅   |
+| 1.14.4  |    ❌    |  ❌   |   ✅   |  ✅   |    ✅   |
 | 1.13.2  |    ❌    |  ❌   |   ❌   |  ❌   |    ✅   |
 | 1.12.2  |    ❌    |  ✅   |   ❌   |  ❌   |    ✅   |
 | 1.11.2  |    ❌    |  ✅   |   ❌   |  ❌   |    ✅   |

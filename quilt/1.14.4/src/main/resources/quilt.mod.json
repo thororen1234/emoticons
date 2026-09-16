@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "quilt_loader": {
+    "group": "mchorse.emoticons",
+    "id": "emoticons",
+    "version": "${version}",
+    "metadata": {
+      "name": "Emoticons",
+      "description": "Player animations and emotes for Ornithe.",
+      "contact": {
+        "homepage": "https://github.com/mchorse/emoticons"
+      },
+      "license": "GPL-3.0-only"
+    },
+    "intermediate_mappings": "net.fabricmc:intermediary",
+    "entrypoints": {
+      "client": [
+        "mchorse.emoticons.ClientEntrypoint"
+      ],
+      "main": [
+        "mchorse.emoticons.MainEntrypoint"
+      ]
+    },
+    "depends": [
+      {
+        "id": "quilt_loader",
+        "versions": "*"
+      },
+      {
+        "id": "minecraft",
+        "versions": "1.14.4"
+      },
+      {
+        "id": "java",
+        "versions": ">=8"
+      }
+    ]
+  },
+  "mixin": [
+    "emoticons.mixins.json"
+  ]
+}
