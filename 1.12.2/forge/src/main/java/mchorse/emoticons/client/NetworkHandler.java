@@ -3,7 +3,7 @@ package mchorse.emoticons.client;
 import java.nio.charset.Charset;
 
 import mchorse.emoticons.ClientProxy;
-import mchorse.emoticons.capabilities.cosmetic.Cosmetic;
+import mchorse.emoticons.capabilities.cosmetic.EmoteController;
 import mchorse.emoticons.capabilities.cosmetic.ICosmetic;
 import mchorse.emoticons.capabilities.cosmetic.CosmeticMode;
 import mchorse.emoticons.common.emotes.Emotes;
@@ -80,7 +80,7 @@ public class NetworkHandler
                 return;
             }
 
-            ICosmetic cap = Cosmetic.get(player);
+            ICosmetic cap = EmoteController.get(player);
 
             if (this.args.length == 1)
             {

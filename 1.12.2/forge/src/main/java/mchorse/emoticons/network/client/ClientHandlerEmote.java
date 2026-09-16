@@ -1,37 +1,42 @@
 package mchorse.emoticons.network.client;
 
-import mchorse.emoticons.api.metamorph.MetamorphHandler;
-import mchorse.emoticons.capabilities.cosmetic.Cosmetic;
+import mchorse.emoticons.capabilities.cosmetic.EmoteController;
 import mchorse.emoticons.capabilities.cosmetic.ICosmetic;
 import mchorse.emoticons.network.common.PacketEmote;
-import mchorse.mclib.network.ClientMessageHandler;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ClientHandlerEmote extends ClientMessageHandler<PacketEmote>
+public class ClientHandlerEmote implements IMessageHandler<PacketEmote, IMessage>
 {
     @Override
     @SideOnly(Side.CLIENT)
-    public void run(EntityPlayerSP player, PacketEmote message)
+    public IMessage onMessage(final PacketEmote message, MessageContext ctx)
     {
-        Entity entity = player.world.getEntityByID(message.id);
-
-        if (entity != null)
+        Minecraft.getMinecraft().addScheduledTask(new Runnable()
         {
-            ICosmetic cap = Cosmetic.get(entity);
-
-            if (cap != null)
+            @Override
+            public void run()
             {
-                cap.setEmote(message.emote, (EntityLivingBase) entity);
-            }
+                Entity entity = Minecraft.getMinecraft().world.getEntityByID(message.id);
 
-            if (MetamorphHandler.isLoaded() && entity instanceof EntityLivingBase)
-            {
-                MetamorphHandler.setEmote(message.emote, (EntityLivingBase) entity);
+                if (entity != null)
+                {
+                    ICosmetic cap = EmoteController.get(entity);
+
+                    if (cap != null && entity instanceof EntityLivingBase)
+                    {
+                        cap.setEmote(message.emote, (EntityLivingBase) entity);
+                    }
+                }
             }
-        }
+        });
+
+        return null;
     }
 }

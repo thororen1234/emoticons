@@ -2,8 +2,6 @@ package mchorse.emoticons.utils;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import com.google.common.base.Predicate;
 
 import net.minecraft.entity.Entity;
@@ -43,7 +41,7 @@ public class EntityUtils
         List<Entity> list = input.world.getEntitiesInAABBexcluding(input, input.getEntityBoundingBox().expand(look.x * maxReach, look.y * maxReach, look.z * maxReach).grow(area, area, area), new Predicate<Entity>()
         {
             @Override
-            public boolean apply(@Nullable Entity entity)
+            public boolean apply(Entity entity)
             {
                 return entity != null && entity.canBeCollidedWith();
             }

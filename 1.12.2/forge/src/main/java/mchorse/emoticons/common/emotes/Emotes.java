@@ -1,6 +1,5 @@
 package mchorse.emoticons.common.emotes;
 
-import mchorse.emoticons.Emoticons;
 import mchorse.emoticons.utils.Time;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -157,7 +156,7 @@ public class Emotes
     {
         EMOTES.put(emote.name, emote);
 
-        if (emote.sound != null && !Emoticons.disableSoundEvents.get() && !REGISTERED)
+        if (emote.sound != null && !REGISTERED)
         {
             ForgeRegistries.SOUND_EVENTS.register(emote.sound);
         }

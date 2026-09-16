@@ -7,6 +7,7 @@ import mchorse.emoticons.client.EntityModelHandler;
 import mchorse.emoticons.client.KeyboardHandler;
 import mchorse.emoticons.client.NetworkHandler;
 import mchorse.emoticons.commands.CommandEmote;
+import mchorse.emoticons.common.emotes.Emotes;
 import mchorse.emoticons.skin_n_bones.api.animation.Animation;
 import mchorse.emoticons.skin_n_bones.api.animation.AnimationManager;
 import mchorse.emoticons.skin_n_bones.api.animation.AnimationManager.AnimationEntry;
@@ -15,27 +16,24 @@ import mchorse.emoticons.skin_n_bones.api.animation.model.AnimatorConfig.Animato
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJAction;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJLoader;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJLoader.BOBJData;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.io.FilenameUtils;
+import net.minecraftforge.fml.common.network.FMLEventChannel;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-@SideOnly(Side.CLIENT)
-public class ClientProxy extends CommonProxy
+public class ClientProxy
 {
+    public static File configFolder;
+
     /**
-     * Emote keys configuration 
+     * Emote keys configuration
      */
     public static EmoteKeys keys;
 
@@ -56,21 +54,17 @@ public class ClientProxy extends CommonProxy
 
     public static BOBJData ragdoll;
 
+    /**
+     * Custom payload channel, allows external plugins to trigger emotes
+     * without the mod being installed on the server
+     */
+    public static FMLEventChannel channel;
+
     public static void reloadActions()
     {
         try
         {
             BOBJData actions = BOBJLoader.readData(ClientProxy.class.getResourceAsStream("/assets/emoticons/models/entity/actions.bobj"));
-
-            try
-            {
-                /* Try loading user animations and emote data */
-                loadUserEmotes(actions);
-            }
-            catch (Exception e)
-            {
-                System.err.println("Failed to load user animation or emote data...");
-            }
 
             actionMap.clear();
             actionMap.putAll(actions.actions);
@@ -84,49 +78,10 @@ public class ClientProxy extends CommonProxy
         }
     }
 
-    private static void loadUserEmotes(BOBJData actions) throws Exception
+    public void init()
     {
-        File user = new File(configFolder, "emotes");
-
-        user.mkdirs();
-
-        File[] files = user.listFiles();
-
-        if (files == null)
-        {
-            return;
-        }
-
-        for (File file : files)
-        {
-            if (!file.getName().endsWith(".bobj"))
-            {
-                continue;
-            }
-
-            File json = new File(file.getParentFile(), FilenameUtils.getBaseName(file.getName()) + ".json");
-            BOBJData data = BOBJLoader.readData(new FileInputStream(file));
-
-            actions.actions.putAll(data.actions);
-
-            if (json.exists())
-            {
-                CommonProxy.registerEmotes(json, (key) ->
-                {
-                    BOBJAction action = data.actions.get("emote_" + key);
-
-                    return action == null ? -1 : action.getDuration();
-                });
-            }
-        }
-    }
-
-    @Override
-    public void preInit(FMLPreInitializationEvent event)
-    {
-        Emoticons.config = event.getModConfigurationDirectory().getAbsolutePath();
-
-        super.preInit(event);
+        configFolder = new File(Minecraft.getMinecraft().mcDataDir, "config/emoticons");
+        configFolder.mkdirs();
 
         /* Load emote keys configuration */
         File file = new File(configFolder, "keys.json");
@@ -139,13 +94,10 @@ public class ClientProxy extends CommonProxy
         }
 
         /* Registering an event channel for custom payload */
-        Emoticons.channel.register(new NetworkHandler());
-    }
+        channel = NetworkRegistry.INSTANCE.newEventDrivenChannel("Emoticons");
+        channel.register(new NetworkHandler());
 
-    @Override
-    public void init(FMLInitializationEvent event)
-    {
-        super.init(event);
+        Emotes.register();
 
         /* Register event handlers */
         MinecraftForge.EVENT_BUS.register(new KeyboardHandler());

@@ -6,9 +6,8 @@ import java.util.List;
 import org.lwjgl.input.Keyboard;
 
 import mchorse.emoticons.ClientProxy;
-import mchorse.emoticons.capabilities.cosmetic.Cosmetic;
+import mchorse.emoticons.capabilities.cosmetic.EmoteController;
 import mchorse.emoticons.capabilities.cosmetic.ICosmetic;
-import mchorse.emoticons.client.gui.GuiEmotes;
 import mchorse.emoticons.common.EmoteAPI;
 import mchorse.emoticons.common.emotes.Emote;
 import mchorse.emoticons.common.emotes.Emotes;
@@ -72,7 +71,7 @@ public class KeyboardHandler
     public void onKeyPress(KeyInputEvent event)
     {
         EntityPlayer player = Minecraft.getMinecraft().player;
-        ICosmetic cap = Cosmetic.get(player);
+        ICosmetic cap = player == null ? null : EmoteController.get(player);
 
         if (cap != null)
         {

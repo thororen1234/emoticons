@@ -2,8 +2,7 @@ package mchorse.emoticons.common;
 
 import io.netty.buffer.Unpooled;
 import mchorse.emoticons.ClientProxy;
-import mchorse.emoticons.Emoticons;
-import mchorse.emoticons.capabilities.cosmetic.Cosmetic;
+import mchorse.emoticons.capabilities.cosmetic.EmoteController;
 import mchorse.emoticons.capabilities.cosmetic.ICosmetic;
 import mchorse.emoticons.capabilities.cosmetic.CosmeticMode;
 import mchorse.emoticons.common.emotes.Emote;
@@ -26,7 +25,7 @@ public class EmoteAPI
 
     public static void setEmote(Emote emote, EntityPlayerMP player)
     {
-        ICosmetic cap = Cosmetic.get(player);
+        ICosmetic cap = EmoteController.get(player);
 
         if (cap != null)
         {
@@ -41,7 +40,7 @@ public class EmoteAPI
     @SideOnly(Side.CLIENT)
     public static void setEmoteClient(String emote, EntityPlayer player)
     {
-        ICosmetic cap = Cosmetic.get(player);
+        ICosmetic cap = EmoteController.get(player);
 
         if (cap == null)
         {
@@ -64,7 +63,7 @@ public class EmoteAPI
             PacketBuffer buffer = new PacketBuffer(Unpooled.buffer(emote.getBytes().length));
             buffer.writeString(emote);
 
-            Emoticons.channel.sendToServer(new FMLProxyPacket(buffer, "Emoticons"));
+            ClientProxy.channel.sendToServer(new FMLProxyPacket(buffer, "Emoticons"));
         }
     }
 }

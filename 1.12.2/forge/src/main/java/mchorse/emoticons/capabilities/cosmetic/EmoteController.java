@@ -1,9 +1,7 @@
 package mchorse.emoticons.capabilities.cosmetic;
 
-import mchorse.emoticons.ClientProxy;
-import mchorse.emoticons.Emoticons;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
-import mchorse.emoticons.blockbuster.BBIntegration;
+import mchorse.emoticons.ClientProxy;
 import mchorse.emoticons.common.EmoteAPI;
 import mchorse.emoticons.common.emotes.Emote;
 import mchorse.emoticons.skin_n_bones.api.animation.model.ActionConfig;
@@ -16,17 +14,27 @@ import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.SoundCategory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.vecmath.Vector4f;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class Cosmetic implements ICosmetic
+/**
+ * Emote controller
+ *
+ * Static-map based replacement for the removed Capability API based
+ * {@code Cosmetic}/{@code CosmeticProvider} pair (matches the pattern used
+ * by the other standalone ports of this mod).
+ */
+public class EmoteController implements ICosmetic
 {
+    public static final Map<UUID, EmoteController> cache = new ConcurrentHashMap<UUID, EmoteController>();
+
     @SideOnly(Side.CLIENT)
     public AnimatorEmoticonsController animator;
 
@@ -44,7 +52,7 @@ public class Cosmetic implements ICosmetic
 
     public static ICosmetic get(Entity entity)
     {
-        return entity.getCapability(CosmeticProvider.COSMETIC, null);
+        return cache.computeIfAbsent(entity.getUniqueID(), (key) -> new EmoteController());
     }
 
     @Override
@@ -61,11 +69,6 @@ public class Cosmetic implements ICosmetic
         if (target.world.isRemote)
         {
             this.setActionEmote(emote, target);
-        }
-
-        if (BBIntegration.isLoaded() && target instanceof EntityPlayerMP)
-        {
-            BBIntegration.recordEmote(emote == null ? "" : emote.name, (EntityPlayer) target);
         }
     }
 
@@ -108,7 +111,7 @@ public class Cosmetic implements ICosmetic
     @SideOnly(Side.CLIENT)
     private void updateClient(EntityLivingBase target)
     {
-        /* On servers without Emoticons mod, reset the emote when 
+        /* On servers without Emoticons mod, reset the emote when
          * finished */
         if (this.emote != null)
         {
@@ -129,7 +132,7 @@ public class Cosmetic implements ICosmetic
         {
             if (this.emote.sound != null && this.emoteAction.getTick(0) == 0)
             {
-                target.world.playSound(target.posX, target.posY, target.posZ, this.emote.sound, SoundCategory.MASTER, mchorse.emoticons.ClientProxy.keys.volume, 1, false);
+                target.world.playSound(target.posX, target.posY, target.posZ, this.emote.sound, net.minecraft.util.SoundCategory.MASTER, ClientProxy.keys.volume, 1, false);
             }
 
             this.emote.updateEmote(target, this.animator, (int) this.emoteAction.getTick(0));
@@ -194,8 +197,7 @@ public class Cosmetic implements ICosmetic
             this.setupAnimator(entity);
         }
 
-        boolean disable = Emoticons.disableAnimations.get();
-        boolean render = this.animator != null && (!disable || this.emote != null);
+        boolean render = this.animator != null;
 
         if (render)
         {
@@ -203,7 +205,7 @@ public class Cosmetic implements ICosmetic
             if (entity instanceof AbstractClientPlayer)
             {
                 AbstractClientPlayer player = (AbstractClientPlayer) entity;
-                String type = player.getSkinType() + this.getPrefix();
+                String type = player.getSkinType();
 
                 if (!type.equals(this.animator.animationName))
                 {
@@ -244,27 +246,6 @@ public class Cosmetic implements ICosmetic
         }
 
         return render;
-    }
-
-    @SideOnly(Side.CLIENT)
-    private String getPrefix()
-    {
-        int mode = Emoticons.modelType.get();
-
-        if (mode == 1)
-        {
-            return "_simple";
-        }
-        else if (mode == 2)
-        {
-            return "_3d";
-        }
-        else if (mode == 3)
-        {
-            return "_simple_plus";
-        }
-
-        return "";
     }
 
     @SideOnly(Side.CLIENT)
