@@ -55,6 +55,16 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = 'UTF-8'
 }
 
+[tasks.named('runClient'), tasks.named('runServer')].each {
+	it.configure {
+		doFirst {
+			def classesDir = sourceSets.main.output.classesDirs.singleFile
+			def resourcesDir = sourceSets.main.output.resourcesDir
+			jvmArgs "-Dfabric.classPathGroups=${resourcesDir}${File.pathSeparator}${classesDir}"
+		}
+	}
+}
+
 jar {
 	from('../LICENSE.txt') {
 		rename { "${it}_${base.archivesName.get()}" }
