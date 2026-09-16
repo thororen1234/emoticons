@@ -6,7 +6,7 @@ Original Author: [mchorse](https://github.com/mchorse)
 
 Built with [Unimined](https://github.com/unimined/unimined), one Gradle project covering every version/loader combination below, laid out as `<version>/<loader>/`.
 
-You can viwe the unimined source on the unimined branch 
+You can view the unimined source on the unimined branch 
 
 ## Supported Versions
 
