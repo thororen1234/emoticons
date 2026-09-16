@@ -4,17 +4,17 @@
 
 Original Author: [mchorse](https://github.com/mchorse)
 
-Built with [Unimined](https://github.com/unimined/unimined), one Gradle project covering every version/loader combination below, laid out as `<version>/<loader>/`.
+Built with [Unimined](https://github.com/unimined/unimined), one Gradle project covering every version/loader combination below, laid out as `<loader>/<version>/`.
 
 ## Supported Versions
 
 | Version | NeoForge | Forge | Fabric | Quilt | Ornithe |
-|---------|:-----:|:------:|:-----:|:-------:|:-------:|
+|---------|:------:|:-------:|:------:|:-------:|:------:|
 | 1.14.4  |   ❌  |   ❌  |   ✅   |   ❌  |    ✅   |
 | 1.13.2  |   ❌  |   ❌  |   ❌   |   ❌  |    ✅   |
 | 1.12.2  |   ❌  |   ✅  |   ❌   |   ❌  |    ✅   |
 | 1.11.2  |   ❌  |   ✅  |   ❌   |   ❌  |    ✅   |
 | 1.10.2  |   ❌  |   ✅  |   ❌   |   ❌  |    ✅   |
-| 1.9.4   |   ✅  |   ❌   |   ❌  |    ✅   |
+| 1.9.4   |   ❌  |   ✅  |   ❌   |   ❌  |    ✅   |
 | 1.8.9   |   ❌  |   ✅  |   ❌   |   ❌  |    ✅   |
 | 1.7.10  |   ❌  |   ✅  |   ❌   |   ❌  |    ✅   |
