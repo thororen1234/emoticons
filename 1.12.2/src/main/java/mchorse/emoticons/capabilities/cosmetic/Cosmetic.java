@@ -129,7 +129,7 @@ public class Cosmetic implements ICosmetic
         {
             if (this.emote.sound != null && this.emoteAction.getTick(0) == 0)
             {
-                target.world.playSound(target.posX, target.posY, target.posZ, this.emote.sound, SoundCategory.MASTER, 0.33F, 1, false);
+                target.world.playSound(target.posX, target.posY, target.posZ, this.emote.sound, SoundCategory.MASTER, mchorse.emoticons.ClientProxy.keys.volume, 1, false);
             }
 
             this.emote.updateEmote(target, this.animator, (int) this.emoteAction.getTick(0));

@@ -1,0 +1,10 @@
+[
+  {
+    "modid": "emoticons",
+    "name": "Emoticons",
+    "description": "Custom player animations and emotes.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "authorList": ["mchorse"]
+  }
+]

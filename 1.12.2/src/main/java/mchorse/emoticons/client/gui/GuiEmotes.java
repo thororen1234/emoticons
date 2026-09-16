@@ -91,6 +91,17 @@ public class GuiEmotes extends GuiBase
         this.model.flex().set(0, 0, 0, 0).relative(this.viewport).w(1, 0).h(1, 0);
 
         this.root.add(this.emotes);
+        
+        GuiButtonElement volumeBtn = new GuiButtonElement(mc, IKey.str("Volume: " + (int)(this.keys.volume * 100) + "%"), (b) -> {
+            this.keys.volume -= 0.2f;
+            if (this.keys.volume < -0.01f) {
+                this.keys.volume = 1.0f;
+            }
+            b.label.set("Volume: " + (int)(this.keys.volume * 100) + "%");
+        });
+        volumeBtn.flex().relative(this.viewport).set(0, 10, 80, 20).x(1, -90);
+        this.root.add(volumeBtn);
+        
         this.setCurrentEmote(0);
 
         this.emotes.list.scroll.scrollSpeed = 20;

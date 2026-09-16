@@ -27,6 +27,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class EmoteKeys
 {
     public List<String> emotes = Arrays.asList("default", "dab", "confused", "pure_salt", "wave", "star_power");
+    public float volume = 1.0f;
 
     public static Gson gson = new GsonBuilder().registerTypeAdapter(EmoteKeys.class, new EmoteKeysAdapter()).setPrettyPrinting().create();
 
@@ -90,6 +91,11 @@ public class EmoteKeys
                         keys.emotes.set(i - 1, this.getString(object, "emote" + i, keys.emotes.get(i - 1)));
                     }
                 }
+                
+                if (object.has("volume") && object.get("volume").isJsonPrimitive())
+                {
+                    keys.volume = object.get("volume").getAsFloat();
+                }
             }
 
             return keys;
@@ -119,6 +125,7 @@ public class EmoteKeys
             }
 
             object.add("emotes", emotes);
+            object.addProperty("volume", src.volume);
 
             return object;
         }
