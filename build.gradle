@@ -1,5 +1,5 @@
 task buildAll {
     group = 'build'
     description = 'Builds every supported Forge project.'
-    dependsOn ':1.7.10:build', ':1.8.9:build', ':1.12.2:build'
+    dependsOn ':1.7.10:build', ':1.8.9:build', ':1.9.4:build', ':1.10.2:build', ':1.12.2:build'
 }
