@@ -1,0 +1,53 @@
+plugins {
+    id 'java'
+    id 'xyz.wagyourtail.unimined' version '1.4.1'
+}
+
+group = 'mchorse.emoticons'
+version = project.mod_version
+
+base {
+    archivesName = 'emoticons'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+unimined.minecraft {
+    version "1.13.2"
+
+    mappings {
+        searge()
+        mcp("snapshot", "20190530-1.13.2")
+    }
+
+    minecraftForge {
+        loader "25.0.223"
+    }
+}
+
+dependencies {
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", "1.13.2"
+
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version, "mcversion": "1.13.2"
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = 'UTF-8'
+}

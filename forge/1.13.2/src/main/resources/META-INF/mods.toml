@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[25,)"
+issueTrackerURL="https://github.com/mchorse/emoticons/issues"
+
+[[mods]]
+    modId="emoticons"
+    version="${version}"
+    displayName="Emoticons"
+    displayURL="https://mchorse.github.io/emoticons/"
+    updateJSONURL="https://raw.githubusercontent.com/mchorse/emoticons/master/version.json"
+    authors="mchorse"
+    credits="Andruxioid for testing, giving ideas and Russian translation!"
+    description='''
+Custom player animation with bends and emotes
+'''
+
+[[dependencies.emoticons]]
+    modId="forge"
+    mandatory=true
+    versionRange="[25,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.emoticons]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[${mcversion}]"
+    ordering="NONE"
+    side="BOTH"

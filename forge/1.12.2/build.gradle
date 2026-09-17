@@ -32,7 +32,7 @@ unimined.minecraft {
     }
 
     minecraftForge {
-        loader "14.23.3.2655"
+        loader "14.23.5.2859"
     }
 }
 
