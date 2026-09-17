@@ -1,5 +1,6 @@
 package mchorse.emoticons.capabilities.cosmetic;
 
+import mchorse.emoticons.ClientConfig;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.common.emotes.Emote;
 import mchorse.emoticons.skin_n_bones.api.animation.model.ActionConfig;
@@ -112,7 +113,7 @@ public class EmoteController implements ICosmetic {
     }
 
     private boolean shouldStopEmote(EntityLivingBase livingBase) {
-        boolean moved = this.emote.shouldStopOnMove()
+        boolean moved = ClientConfig.instance.stopOnMove && this.emote.shouldStopOnMove()
                 && Math.abs(livingBase.posX - this.lastX + (livingBase.posY - this.lastY)
                 + (livingBase.posZ - this.lastZ)) > 0.015;
 
@@ -188,6 +189,10 @@ public class EmoteController implements ICosmetic {
 
     @Override
     public boolean render(EntityLivingBase livingBase, double x, double y, double z, float partialTicks) {
+        if (ClientConfig.instance.disableAnimations) {
+            return false;
+        }
+
         if (this.controller == null) {
             this.setupAnimator(livingBase);
         }
@@ -197,7 +202,7 @@ public class EmoteController implements ICosmetic {
         if (shouldRender) {
             if (livingBase instanceof AbstractClientPlayer) {
                 AbstractClientPlayer player = (AbstractClientPlayer) livingBase;
-                String skinType = player.getSkinType();
+                String skinType = model(player);
 
                 if (!skinType.equals(this.controller.animationName)) {
                     this.controller.animationName = skinType;
@@ -244,9 +249,26 @@ public class EmoteController implements ICosmetic {
         return shouldRender;
     }
 
+    /**
+     * Available model styles, matching the models shipped in this module's
+     * assets folder (this version ships neither the 3d nor the simple_plus
+     * models)
+     */
+    public static final String[] MODELS = {"default", "simple"};
+
+    /**
+     * Get the animation name for given player, based upon their skin type
+     * and the model style picked in the client configuration
+     */
+    public static String model(AbstractClientPlayer player) {
+        String skin = player.getSkinType();
+
+        return "simple".equals(ClientConfig.instance.model) ? skin + "_simple" : skin;
+    }
+
     public void setupAnimator(EntityLivingBase livingBase) {
         AbstractClientPlayer player = (AbstractClientPlayer) livingBase;
-        this.controller = new AnimatorEmoticonsController(player.getSkinType(), new NBTTagCompound());
+        this.controller = new AnimatorEmoticonsController(model(player), new NBTTagCompound());
 
         NBTTagCompound meshCompound = new NBTTagCompound();
         NBTTagCompound bodyCompound = new NBTTagCompound();

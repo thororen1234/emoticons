@@ -53,7 +53,7 @@ public class EntityModelHandler {
         mchorse.emoticons.common.emotes.Emote playingEmote = EmoteController.get(player).getEmote();
         boolean emoting = playingEmote != null;
 
-        if (emoting && playingEmote != this.currentEmote) {
+        if (emoting && playingEmote != this.currentEmote && mchorse.emoticons.ClientConfig.instance.thirdPerson) {
             if (minecraft.gameSettings.thirdPersonView == 0) {
                 this.previousThirdPersonView = 0;
                 minecraft.gameSettings.thirdPersonView = 1;

@@ -93,6 +93,9 @@ public class ClientProxy
             EmoteKeys.toFile(keys, file);
         }
 
+        /* Load client preferences */
+        ClientConfig.load();
+
         /* Registering an event channel for custom payload */
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel("Emoticons");
         channel.register(new NetworkHandler());
@@ -102,6 +105,8 @@ public class ClientProxy
         /* Register event handlers */
         MinecraftForge.EVENT_BUS.register(new KeyboardHandler());
         MinecraftForge.EVENT_BUS.register(new EntityModelHandler());
+
+        mchorse.mclib.client.render.RenderLightmap.create();
 
         ClientCommandHandler.instance.registerCommand(new CommandEmote());
 

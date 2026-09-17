@@ -35,6 +35,8 @@ public class ClientProxy {
             keys = new mchorse.emoticons.client.EmoteKeys();
         }
 
+        ClientConfig.load();
+
         EntityModelHandler modelHandler = new EntityModelHandler();
         MinecraftForge.EVENT_BUS.register(modelHandler);
         FMLCommonHandler.instance().bus().register(modelHandler);

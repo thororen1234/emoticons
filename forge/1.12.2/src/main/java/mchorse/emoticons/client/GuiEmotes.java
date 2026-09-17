@@ -10,6 +10,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import mchorse.emoticons.ClientConfig;
 import mchorse.emoticons.ClientProxy;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.capabilities.cosmetic.EmoteController;
@@ -52,6 +53,9 @@ public class GuiEmotes extends GuiScreen
     private List<GuiButton> slotButtons = new ArrayList<GuiButton>();
     private String searchText = "";
     private boolean searchFocused = false;
+
+    private int settingsX;
+    private int settingsY;
 
     private float previewRotation = 0;
     private boolean isDragging = false;
@@ -103,9 +107,20 @@ public class GuiEmotes extends GuiScreen
         this.slotButtons.clear();
         this.buttonList.clear();
 
-        this.buttonList.add(new GuiButton(10, LIST_WIDTH + 5, 34, 60, 20, "Play"));
-        this.buttonList.add(new GuiButton(11, LIST_WIDTH + 70, 34, 60, 20, "Stop"));
-        this.buttonList.add(new GuiButton(12, LIST_WIDTH + 135, 34, 90, 20, "Volume: " + (int) (this.keys.volume * 100) + "%"));
+        this.settingsX = LIST_WIDTH + 5;
+        this.settingsY = 34;
+
+        this.addSetting(13, animLabel(), "Anim: Off");
+        this.addSetting(14, stopOnMoveLabel(), "Stop on Move: Off");
+        this.addSetting(15, thirdPersonLabel(), "3rd Person: Off");
+        this.addSetting(16, soundsLabel(), "Sounds: Off");
+        this.addSetting(12, volumeLabel(), "Volume: 100%");
+        this.addSetting(17, modelLabel(), "Model: simple_plus");
+
+        int playY = this.settingsY + BTN_HEIGHT + 4;
+
+        this.buttonList.add(new GuiButton(10, LIST_WIDTH + 5, playY, 60, 20, "Play"));
+        this.buttonList.add(new GuiButton(11, LIST_WIDTH + 70, playY, 60, 20, "Stop"));
 
         int btnW = Math.max(30, (this.width - LIST_WIDTH - 10 - 5 * 5) / 6);
         int btnY = this.height - BOTTOM_HEIGHT + (BOTTOM_HEIGHT - BTN_HEIGHT) / 2;
@@ -140,14 +155,51 @@ public class GuiEmotes extends GuiScreen
 
         if (id == 12)
         {
-            this.keys.volume -= 0.2f;
+            ClientConfig.instance.volume -= 0.2F;
 
-            if (this.keys.volume < -0.01f)
+            if (ClientConfig.instance.volume < -0.01F)
             {
-                this.keys.volume = 1.0f;
+                ClientConfig.instance.volume = 1.0F;
             }
 
-            button.displayString = "Volume: " + (int) (this.keys.volume * 100) + "%";
+            button.displayString = volumeLabel();
+            ClientConfig.save();
+        }
+
+        if (id == 13)
+        {
+            ClientConfig.instance.disableAnimations = !ClientConfig.instance.disableAnimations;
+            button.displayString = animLabel();
+            ClientConfig.save();
+        }
+
+        if (id == 14)
+        {
+            ClientConfig.instance.stopOnMove = !ClientConfig.instance.stopOnMove;
+            button.displayString = stopOnMoveLabel();
+            ClientConfig.save();
+        }
+
+        if (id == 15)
+        {
+            ClientConfig.instance.thirdPerson = !ClientConfig.instance.thirdPerson;
+            button.displayString = thirdPersonLabel();
+            ClientConfig.save();
+        }
+
+        if (id == 16)
+        {
+            ClientConfig.instance.sounds = !ClientConfig.instance.sounds;
+            button.displayString = soundsLabel();
+            ClientConfig.save();
+        }
+
+        if (id == 17)
+        {
+            ClientConfig.instance.model = nextModel();
+            button.displayString = modelLabel();
+            ClientConfig.save();
+            this.refreshModel();
         }
 
         if (id >= 0 && id < 6)
@@ -386,6 +438,7 @@ public class GuiEmotes extends GuiScreen
     public void onGuiClosed()
     {
         EmoteKeys.toFile(this.keys, new File(ClientProxy.configFolder, "keys.json"));
+        ClientConfig.save();
     }
 
     private void applyFilter()
@@ -432,6 +485,111 @@ public class GuiEmotes extends GuiScreen
         {
             slotButtons.get(idx).displayString = (idx + 1) + ": " + formatEmoteName(this.keys.emotes.get(idx));
         }
+    }
+
+    /**
+     * Lay out a settings button, wrapping onto the next row when it doesn't
+     * fit anymore. The width is derived from the longest label the button
+     * can ever show, so that it doesn't jump around when toggled
+     */
+    private void addSetting(int id, String label, String widest)
+    {
+        int w = this.fontRenderer.getStringWidth(widest) + 12;
+
+        if (this.settingsX + w > this.width - 5)
+        {
+            this.settingsX = LIST_WIDTH + 5;
+            this.settingsY += BTN_HEIGHT + 4;
+        }
+
+        this.buttonList.add(new GuiButton(id, this.settingsX, this.settingsY, w, BTN_HEIGHT, label));
+
+        this.settingsX += w + 5;
+    }
+
+    /**
+     * Rebuild the preview (and the player's own animator) after the model
+     * style was changed
+     */
+    private void refreshModel()
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+        EmoteController ec = (EmoteController) EmoteController.get(mc.player);
+
+        if (ec == null)
+        {
+            return;
+        }
+
+        ec.setupAnimator(mc.player);
+
+        if (ec.animator == null)
+        {
+            return;
+        }
+
+        this.controller = new AnimatorEmoticonsController(ec.animator.animationName, ec.animator.userData);
+        this.controller.fetchAnimation();
+
+        if (mc.player instanceof AbstractClientPlayer)
+        {
+            ResourceLocation skinTex = ((AbstractClientPlayer) mc.player).getLocationSkin();
+
+            if (this.controller.userConfig != null && this.controller.userConfig.meshes.containsKey("body"))
+            {
+                this.controller.userConfig.meshes.get("body").texture = skinTex;
+            }
+        }
+    }
+
+    private static String nextModel()
+    {
+        String[] models = EmoteController.MODELS;
+
+        for (int i = 0; i < models.length; i ++)
+        {
+            if (models[i].equals(ClientConfig.instance.model))
+            {
+                return models[(i + 1) % models.length];
+            }
+        }
+
+        return models[0];
+    }
+
+    private static String onOff(boolean value)
+    {
+        return value ? "On" : "Off";
+    }
+
+    private static String animLabel()
+    {
+        return "Anim: " + onOff(!ClientConfig.instance.disableAnimations);
+    }
+
+    private static String stopOnMoveLabel()
+    {
+        return "Stop on Move: " + onOff(ClientConfig.instance.stopOnMove);
+    }
+
+    private static String thirdPersonLabel()
+    {
+        return "3rd Person: " + onOff(ClientConfig.instance.thirdPerson);
+    }
+
+    private static String soundsLabel()
+    {
+        return "Sounds: " + onOff(ClientConfig.instance.sounds);
+    }
+
+    private static String volumeLabel()
+    {
+        return "Volume: " + (int) (ClientConfig.instance.volume * 100) + "%";
+    }
+
+    private static String modelLabel()
+    {
+        return "Model: " + ClientConfig.instance.model;
     }
 
     public static String formatEmoteName(String key)

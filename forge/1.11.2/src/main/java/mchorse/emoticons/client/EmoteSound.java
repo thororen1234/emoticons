@@ -1,6 +1,6 @@
 package mchorse.emoticons.client;
 
-import mchorse.emoticons.ClientProxy;
+import mchorse.emoticons.ClientConfig;
 import mchorse.emoticons.common.emotes.Emote;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MovingSound;
@@ -16,12 +16,12 @@ public class EmoteSound extends MovingSound {
         super(new SoundEvent(new ResourceLocation("emoticons", emote.key)), SoundCategory.PLAYERS);
         this.player = player;
         this.repeat = emote.looping;
-        this.volume = Math.max(0.0F, Math.min(1.0F, ClientProxy.keys.volume));
+        this.volume = Math.max(0.0F, Math.min(1.0F, ClientConfig.instance.volume));
         this.update();
     }
 
     public static EmoteSound play(EntityLivingBase player, Emote emote) {
-        if (ClientProxy.keys.volume <= 0.0F) return null;
+        if (!ClientConfig.instance.sounds || ClientConfig.instance.volume <= 0.0F) return null;
         Minecraft mc = Minecraft.getMinecraft();
         
         EmoteSound sound = new EmoteSound(player, emote);

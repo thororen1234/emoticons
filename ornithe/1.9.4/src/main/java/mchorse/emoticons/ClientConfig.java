@@ -26,11 +26,17 @@ public final class ClientConfig {
 				Emoticons.LOGGER.warn("Unable to read emote preferences", e);
 			}
 		} else {
-			try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
-				gson.toJson(instance, writer);
-			} catch (IOException e) {
-				Emoticons.LOGGER.warn("Unable to save emote preferences", e);
-			}
+			save();
+		}
+	}
+
+	public static void save() {
+		File file = new File(ClientProxy.configFolder, "config.json");
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		try (Writer writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+			gson.toJson(instance, writer);
+		} catch (IOException e) {
+			Emoticons.LOGGER.warn("Unable to save emote preferences", e);
 		}
 	}
 }

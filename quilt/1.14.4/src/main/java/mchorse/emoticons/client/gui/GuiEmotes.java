@@ -2,6 +2,7 @@ package mchorse.emoticons.client.gui;
 
 import mchorse.emoticons.skin_n_bones.api.animation.model.ActionConfig;
 
+import mchorse.emoticons.ClientConfig;
 import mchorse.emoticons.ClientProxy;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.capabilities.cosmetic.EmoteController;
@@ -40,7 +41,13 @@ public class GuiEmotes extends Screen {
 	private int selectedIndex = -1;
 	private int slotIndex = 0;
 
+	/** Model variants that have asset files under assets/emoticons/models/entity. */
+	private static final String[] MODELS = {"default", "3d", "simple", "simple_plus"};
+	private static final int SETTINGS_Y = 34;
+	private static final int PLAY_Y = 58;
+
 	private List<AbstractButtonWidget> slotButtons = new ArrayList<>();
+	private List<AbstractButtonWidget> settingButtons = new ArrayList<>();
 	private String searchText = "";
 	private boolean searchFocused = false;
 
@@ -89,22 +96,50 @@ public class GuiEmotes extends Screen {
 	@Override
 	public void init() {
 		this.slotButtons.clear();
+		this.settingButtons.clear();
 		this.buttons.clear();
 
-		this.buttons.add(new AbstractButtonWidget(LIST_WIDTH + 5, 34, 60, 20, "Play") {
+		this.addButton(new AbstractButtonWidget(LIST_WIDTH + 5, PLAY_Y, 60, 20, "Play") {
 			@Override
 			public void onClick(double mouseX, double mouseY) {
 				super.onClick(mouseX, mouseY);
 				handleButtonClick(this);
 			}
 		});
-		this.buttons.add(new AbstractButtonWidget(LIST_WIDTH + 68, 34, 40, 20, "Stop") {
+		this.addButton(new AbstractButtonWidget(LIST_WIDTH + 70, PLAY_Y, 60, 20, "Stop") {
 			@Override
 			public void onClick(double mouseX, double mouseY) {
 				super.onClick(mouseX, mouseY);
 				handleButtonClick(this);
 			}
 		});
+
+		int setX = LIST_WIDTH + 5;
+		int available = this.width - LIST_WIDTH - 10 - 5 * 5;
+		int[] setWidths = new int[6];
+		int setTotal = 0;
+
+		for (int i = 0; i < 6; i++) {
+			setWidths[i] = this.font.getStringWidth(settingWidestLabel(i)) + 10;
+			setTotal += setWidths[i];
+		}
+
+		for (int i = 0; i < 6; i++) {
+			final int index = i;
+			int setW = setTotal > available ? Math.max(20, available * setWidths[i] / setTotal) : setWidths[i];
+			AbstractButtonWidget setBtn = new AbstractButtonWidget(setX, SETTINGS_Y, setW, BTN_HEIGHT, settingLabel(i)) {
+				@Override
+				public void onClick(double mouseX, double mouseY) {
+					super.onClick(mouseX, mouseY);
+					toggleSetting(index);
+				}
+			};
+
+			this.settingButtons.add(setBtn);
+			this.addButton(setBtn);
+			setX += setW + 5;
+		}
+
 		int btnW = Math.max(30, (this.width - LIST_WIDTH - 10 - 5 * 5) / 6);
 		int btnY = this.height - BOTTOM_HEIGHT + (BOTTOM_HEIGHT - BTN_HEIGHT) / 2;
 
@@ -154,7 +189,7 @@ public class GuiEmotes extends Screen {
 		this.font.drawWithShadow("Search:", 5, 5, 0xAAAAAA);
 		DrawableHelper.fill(5, 15, LIST_WIDTH - 5, 29, 0xFF555555);
 		DrawableHelper.fill(6, 16, LIST_WIDTH - 6, 28, 0xFF222222);
-		String displaySearch = searchText + (searchFocused ? "|" : "");
+		String displaySearch = searchText + (searchFocused ? "_" : "");
 		this.font.drawWithShadow(displaySearch, 8, 18, 0xFFFFFF);
 
 		for (int i = 0; i < visibleRows; i++) {
@@ -329,6 +364,7 @@ public class GuiEmotes extends Screen {
 	@Override
 	public void removed() {
 		EmoteKeys.toFile(this.keys, new File(ClientProxy.configFolder, "keys.json"));
+		ClientConfig.save();
 	}
 
 	private void applyFilter() {
@@ -356,6 +392,66 @@ public class GuiEmotes extends Screen {
 	private void updateSlotButton(int idx) {
 		if (idx < slotButtons.size()) {
 			slotButtons.get(idx).setMessage((idx + 1) + ": " + formatEmoteName(this.keys.emotes.get(idx)));
+		}
+	}
+
+	/** Widest label a setting button can ever show, so its width never jumps when clicked. */
+	private static String settingWidestLabel(int index) {
+		switch (index) {
+			case 0: return "Anim: Off";
+			case 1: return "Stop on Move: Off";
+			case 2: return "3rd Person: Off";
+			case 3: return "Sounds: Off";
+			case 4: return "Volume: 100%";
+			default: return "Model: simple_plus";
+		}
+	}
+
+	private static String settingLabel(int index) {
+		ClientConfig config = ClientConfig.instance;
+
+		switch (index) {
+			case 0: return "Anim: " + (config.disableAnimations ? "Off" : "On");
+			case 1: return "Stop on Move: " + (config.stopOnMove ? "On" : "Off");
+			case 2: return "3rd Person: " + (config.thirdPerson ? "On" : "Off");
+			case 3: return "Sounds: " + (config.sounds ? "On" : "Off");
+			case 4: return "Volume: " + Math.round(config.volume * 100) + "%";
+			default: return "Model: " + config.model;
+		}
+	}
+
+	private void toggleSetting(int index) {
+		ClientConfig config = ClientConfig.instance;
+
+		switch (index) {
+			case 0:
+				config.disableAnimations = !config.disableAnimations;
+				break;
+			case 1:
+				config.stopOnMove = !config.stopOnMove;
+				break;
+			case 2:
+				config.thirdPerson = !config.thirdPerson;
+				break;
+			case 3:
+				config.sounds = !config.sounds;
+				break;
+			case 4:
+				/* Same -20% wrapping cycle as the original 1.12.2 volume button. */
+				config.volume -= 0.2F;
+				if (config.volume < -0.01F) config.volume = 1.0F;
+				break;
+			default:
+				int model = 0;
+				for (int i = 0; i < MODELS.length; i++) {
+					if (MODELS[i].equals(config.model)) model = i;
+				}
+				config.model = MODELS[(model + 1) % MODELS.length];
+				break;
+		}
+
+		if (index < settingButtons.size()) {
+			settingButtons.get(index).setMessage(settingLabel(index));
 		}
 	}
 

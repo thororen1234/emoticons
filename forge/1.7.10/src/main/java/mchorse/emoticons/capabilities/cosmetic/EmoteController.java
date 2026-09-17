@@ -1,5 +1,6 @@
 package mchorse.emoticons.capabilities.cosmetic;
 
+import mchorse.emoticons.ClientConfig;
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
 import mchorse.emoticons.common.emotes.Emote;
 import mchorse.emoticons.skin_n_bones.api.animation.model.ActionConfig;
@@ -121,7 +122,7 @@ public class EmoteController implements ICosmetic {
     }
 
     private boolean shouldStopEmote(EntityLivingBase livingBase) {
-        boolean moved = this.emote.shouldStopOnMove()
+        boolean moved = ClientConfig.instance.stopOnMove && this.emote.shouldStopOnMove()
                 && Math.abs(livingBase.posX - this.lastX + (livingBase.posY - this.lastY)
                 + (livingBase.posZ - this.lastZ)) > 0.015;
 
@@ -193,6 +194,10 @@ public class EmoteController implements ICosmetic {
 
     @Override
     public boolean render(EntityLivingBase livingBase, double x, double y, double z, float partialTicks) {
+        if (ClientConfig.instance.disableAnimations) {
+            return false;
+        }
+
         if (this.controller == null) {
             this.setupAnimator(livingBase);
         }
@@ -244,9 +249,24 @@ public class EmoteController implements ICosmetic {
         return shouldRender;
     }
 
+    /**
+     * Available model styles, matching the models shipped in this module's
+     * assets folder (1.7.10 ships neither the 3d nor the simple_plus models)
+     */
+    public static final String[] MODELS = {"default", "simple"};
+
+    /**
+     * Get the animation name based upon the model style picked in the
+     * client configuration. 1.7.10 has no slim (Alex) skin type, so the
+     * skin part is always "default"
+     */
+    public static String model(EntityLivingBase livingBase) {
+        return "simple".equals(ClientConfig.instance.model) ? "default_simple" : "default";
+    }
+
     public void setupAnimator(EntityLivingBase livingBase) {
         AbstractClientPlayer player = (AbstractClientPlayer) livingBase;
-        this.controller = new AnimatorEmoticonsController("default", new NBTTagCompound());
+        this.controller = new AnimatorEmoticonsController(model(livingBase), new NBTTagCompound());
 
         NBTTagCompound meshCompound = new NBTTagCompound();
         NBTTagCompound bodyCompound = new NBTTagCompound();

@@ -1,6 +1,7 @@
 package mchorse.emoticons.capabilities.cosmetic;
 
 import mchorse.emoticons.api.animation.model.AnimatorEmoticonsController;
+import mchorse.emoticons.ClientConfig;
 import mchorse.emoticons.ClientProxy;
 import mchorse.emoticons.common.EmoteAPI;
 import mchorse.emoticons.common.emotes.Emote;
@@ -14,6 +15,7 @@ import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.Side;
@@ -50,9 +52,33 @@ public class EmoteController implements ICosmetic
     private double lastZ;
     private long lastUpdate = System.currentTimeMillis();
 
+    /**
+     * Perspective the player was in before the emote forced third person
+     * view (-1 means the perspective wasn't changed by this mod)
+     */
+    @SideOnly(Side.CLIENT)
+    private int previousPerspective = -1;
+
     public static ICosmetic get(Entity entity)
     {
         return cache.computeIfAbsent(entity.getUniqueID(), (key) -> new EmoteController());
+    }
+
+    /**
+     * Advance this player's emote state by one tick. Must be driven from a
+     * per-tick hook (see {@code EntityModelHandler#onPlayerTick}) - nothing
+     * else calls {@link #update(EntityLivingBase)} during actual gameplay,
+     * so without this the emote animation never advances past frame 0.
+     */
+    @SideOnly(Side.CLIENT)
+    public static void postUpdate(EntityPlayer player)
+    {
+        EmoteController controller = (EmoteController) cache.get(player.getUniqueID());
+
+        if (controller != null)
+        {
+            controller.update(player);
+        }
     }
 
     @Override
@@ -117,8 +143,9 @@ public class EmoteController implements ICosmetic
         {
             /* Turn off emote when player moves */
             double diff = Math.abs((target.posX - this.lastX) + (target.posY - this.lastY) + (target.posZ - this.lastZ));
+            boolean moved = ClientConfig.instance.stopOnMove && diff > 0.015;
 
-            if (diff > 0.015 || (!this.emote.looping && this.emoteTimer >= this.emote.duration))
+            if (moved || (!this.emote.looping && this.emoteTimer >= this.emote.duration))
             {
                 this.setEmote(null, target);
             }
@@ -130,9 +157,14 @@ public class EmoteController implements ICosmetic
 
         if (this.emote != null && this.emoteAction != null)
         {
-            if (this.emote.sound != null && this.emoteAction.getTick(0) == 0)
+            if (this.emote.sound != null && this.emoteAction.getTick(0) == 0 && ClientConfig.instance.sounds)
             {
-                target.world.playSound(target.posX, target.posY, target.posZ, this.emote.sound, net.minecraft.util.SoundCategory.MASTER, ClientProxy.keys.volume, 1, false);
+                float volume = Math.max(0.0F, Math.min(1.0F, ClientConfig.instance.volume));
+
+                if (volume > 0.0F)
+                {
+                    target.world.playSound(target.posX, target.posY, target.posZ, this.emote.sound, net.minecraft.util.SoundCategory.MASTER, volume, 1, false);
+                }
             }
 
             this.emote.updateEmote(target, this.animator, (int) this.emoteAction.getTick(0));
@@ -158,6 +190,40 @@ public class EmoteController implements ICosmetic
         {
             this.emote.stopAnimation(this.animator);
         }
+
+        this.restorePerspective();
+    }
+
+    /**
+     * Switch the camera into third person view, so that the player can
+     * actually see the emote they're playing
+     */
+    @SideOnly(Side.CLIENT)
+    private void switchPerspective(EntityLivingBase target)
+    {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        if (target == mc.player && ClientConfig.instance.thirdPerson && mc.gameSettings.thirdPersonView == 0)
+        {
+            this.previousPerspective = 0;
+            mc.gameSettings.thirdPersonView = 1;
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void restorePerspective()
+    {
+        if (this.previousPerspective != -1)
+        {
+            Minecraft mc = Minecraft.getMinecraft();
+
+            if (mc.gameSettings.thirdPersonView == 1)
+            {
+                mc.gameSettings.thirdPersonView = this.previousPerspective;
+            }
+
+            this.previousPerspective = -1;
+        }
     }
 
     @SideOnly(Side.CLIENT)
@@ -176,6 +242,8 @@ public class EmoteController implements ICosmetic
             this.animator.setEmote(this.emoteAction);
 
             emote.startAnimation(this.animator);
+
+            this.switchPerspective(target);
         }
         else
         {
@@ -205,7 +273,7 @@ public class EmoteController implements ICosmetic
             if (entity instanceof AbstractClientPlayer)
             {
                 AbstractClientPlayer player = (AbstractClientPlayer) entity;
-                String type = player.getSkinType();
+                String type = model(player);
 
                 if (!type.equals(this.animator.animationName))
                 {
@@ -248,12 +316,35 @@ public class EmoteController implements ICosmetic
         return render;
     }
 
+    /**
+     * Available model styles, matching the models shipped in this module's
+     * assets folder
+     */
+    public static final String[] MODELS = {"default", "3d", "simple", "simple_plus"};
+
+    /**
+     * Get the animation name for given player, based upon their skin type
+     * and the model style picked in the client configuration
+     */
+    @SideOnly(Side.CLIENT)
+    public static String model(AbstractClientPlayer player)
+    {
+        String skin = player.getSkinType();
+        String style = ClientConfig.instance.model;
+
+        if ("3d".equals(style)) return skin + "_3d";
+        if ("simple".equals(style)) return skin + "_simple";
+        if ("simple_plus".equals(style)) return skin + "_simple_plus";
+
+        return skin;
+    }
+
     @SideOnly(Side.CLIENT)
     public void setupAnimator(EntityLivingBase entity)
     {
         AbstractClientPlayer player = (AbstractClientPlayer) entity;
 
-        this.animator = new AnimatorEmoticonsController(player.getSkinType(), new NBTTagCompound());
+        this.animator = new AnimatorEmoticonsController(model(player), new NBTTagCompound());
 
         NBTTagCompound meshes = new NBTTagCompound();
         NBTTagCompound body = new NBTTagCompound();
