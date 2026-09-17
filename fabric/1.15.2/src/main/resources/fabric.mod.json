@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "emoticons",
+  "version": "${version}",
+  "name": "Emoticons",
+  "description": "Player animations and emotes.",
+  "authors": [
+    "mchorse"
+  ],
+  "contact": {
+    "homepage": "https://github.com/mchorse/emoticons"
+  },
+  "license": "GPL-3.0-only",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "mchorse.emoticons.ClientEntrypoint"
+    ],
+    "main": [
+      "mchorse.emoticons.MainEntrypoint"
+    ]
+  },
+  "mixins": [
+    "emoticons.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "1.15.2",
+    "java": ">=8",
+    "fabric": "*"
+  }
+}

@@ -6,7 +6,7 @@
     "version": "${version}",
     "metadata": {
       "name": "Emoticons",
-      "description": "Player animations and emotes for Ornithe.",
+      "description": "Player animations and emotes.",
       "contact": {
         "homepage": "https://github.com/mchorse/emoticons"
       },
