@@ -10,14 +10,14 @@ Built with [Unimined](https://github.com/unimined/unimined), one Gradle project 
 
 ### 26
 
-| Version | Forge | Ornithe | Fabric | Quilt | NeoForge |
+| Version | Forge | Ornithe | Fabric | Quilt | NeoForged |
 | - | :-: | :-: | :-: | :-: | :-: |
 | 26.2 | ❌ | ❌ | ❌ | ❌ | ❌ |
 | 26.1.2 | ❌ | ❌ | ❌ | ❌ | ❌ |
 
 ### 1.13 - 1.21
 
-| Version | Forge | Ornithe | Fabric | Quilt | NeoForge |
+| Version | Forge | Ornithe | Fabric | Quilt | NeoForged |
 | - | :-: | :-: | :-: | :-: | :-: |
 | 1.21.11 | ❌ | ❌ | ❌ | ❌ | ❌ |
 | 1.21.4 | ❌ | ❌ | ❌ | ❌ | ❌ |
@@ -39,7 +39,7 @@ Built with [Unimined](https://github.com/unimined/unimined), one Gradle project 
 
 ### 1.7 - 1.12
 
-| Version | Forge | Ornithe | Fabric | Quilt | NeoForge |
+| Version | Forge | Ornithe | Fabric | Quilt | NeoForged |
 | - | :-: | :-: | :-: | :-: | :-: |
 | 1.12.2 | ✅ | ✅ | ❌ | ❌ | ❌ |
 | 1.11.2 | ✅ | ✅ | ❌ | ❌ | ❌ |
