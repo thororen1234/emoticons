@@ -43,7 +43,7 @@ public class KeyboardHandler {
 		int KEY_NUMPAD4 = GLFW.GLFW_KEY_KP_4;
 		int KEY_NUMPAD5 = GLFW.GLFW_KEY_KP_5;
 		int KEY_NUMPAD6 = GLFW.GLFW_KEY_KP_6;
-		int KEY_P = GLFW.GLFW_KEY_P;
+		int KEY_M = GLFW.GLFW_KEY_M;
 		int KEY_NONE = GLFW.GLFW_KEY_UNKNOWN;
 
 		random = new KeyBinding(pre + "random", KEY_O, pre + "category");
@@ -53,7 +53,7 @@ public class KeyboardHandler {
 		emote4 = new KeyBinding(pre + "emote4", KEY_NUMPAD4, pre + "category");
 		emote5 = new KeyBinding(pre + "emote5", KEY_NUMPAD5, pre + "category");
 		emote6 = new KeyBinding(pre + "emote6", KEY_NUMPAD6, pre + "category");
-		emotes = new KeyBinding(pre + "emotes", KEY_P, pre + "category");
+		emotes = new KeyBinding(pre + "emotes", KEY_M, pre + "category");
 		stopEmote = new KeyBinding(pre + "stop_emote", KEY_NONE, pre + "category");
 		reloadEmotes = new KeyBinding(pre + "reload_emotes", KEY_NONE, pre + "category");
 
