@@ -15,7 +15,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.DyeableItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 
 public class AnimatorEmoticonsController extends AnimatorController {
@@ -30,7 +30,7 @@ public class AnimatorEmoticonsController extends AnimatorController {
 	public ItemStack itemSlot;
 	public float itemSlotScale;
 
-	public AnimatorEmoticonsController(String name, CompoundTag data) {
+	public AnimatorEmoticonsController(String name, NbtCompound data) {
 		super(name, data);
 		this.itemSlot = null;
 		this.itemSlotScale = 0.0f;
@@ -52,20 +52,36 @@ public class AnimatorEmoticonsController extends AnimatorController {
 		}
 
 		float scaleItems = this.userConfig.scaleItems;
-		ItemStack heldItem = livingBase
-				.getEquippedStack(EquipmentSlot.MAINHAND);
+		ItemStack heldItem = livingBase.getEquippedStack(EquipmentSlot.MAINHAND);
+		ItemStack offItem = livingBase.getEquippedStack(EquipmentSlot.OFFHAND);
 
 		if (this.itemSlot != null) {
 			if (this.itemSlotScale > 0.0f) {
 				for (AnimatorHeldItemConfig config : this.userConfig.rightHands.values()) {
 					this.renderItem(livingBase, matrices, vertexConsumers, light, this.itemSlot, armature, config,
-							null, scaleItems * this.itemSlotScale);
+							net.minecraft.client.render.model.json.ModelTransformation.Mode.THIRD_PERSON_RIGHT_HAND, scaleItems * this.itemSlotScale);
 				}
 			}
 		} else if (heldItem != null && this.userConfig.rightHands != null) {
 			for (AnimatorHeldItemConfig config : this.userConfig.rightHands.values()) {
 				this.renderItem(livingBase, matrices, vertexConsumers, light, heldItem, armature, config,
-						null, scaleItems);
+						
+				}
+			}
+		} else {
+			if (heldItem != null && this.userConfig.rightHands != null) {
+				for (AnimatorHeldItemConfig config : this.userConfig.rightHands.values()) {
+					this.renderItem(livingBase, matrices, vertexConsumers, light, heldItem, armature, config,
+							net.minecraft.client.render.model.json.ModelTransformation.Mode.THIRD_PERSON_RIGHT_HAND, scaleItems);
+			}
+		}
+				}
+			}
+			if (offItem != null && this.userConfig.leftHands != null) {
+				for (AnimatorHeldItemConfig config : this.userConfig.leftHands.values()) {
+					this.renderItem(livingBase, matrices, vertexConsumers, light, offItem, armature, config,
+							net.minecraft.client.render.model.json.ModelTransformation.Mode.THIRD_PERSON_LEFT_HAND, scaleItems);
+				}
 			}
 		}
 	}

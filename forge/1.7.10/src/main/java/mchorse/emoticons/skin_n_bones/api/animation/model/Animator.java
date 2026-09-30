@@ -44,7 +44,8 @@ public class Animator implements IAnimator {
     public boolean wasOnGround;
     public boolean wasShooting;
     public boolean wasConsuming;
-    public AnimatorController controller;
+	public float prevHandSwingProgress;
+	public AnimatorController controller;
 
     public Animator(final AnimatorController controller) {
         this.actions = new ArrayList();

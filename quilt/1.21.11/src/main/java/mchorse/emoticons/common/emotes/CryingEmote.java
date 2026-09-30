@@ -19,7 +19,7 @@ public class CryingEmote extends Emote {
 			BOBJBone hand = armature.bones.get("head");
 			Vector4f result = animator.calcPosition(entity, hand, 0, 0.5F, 0.35F, partial);
 
-			entity.world.addParticle(ParticleTypes.RAIN, result.x, result.y, result.z, 1, -1, 1);
+			entity.getWorld().addParticle(ParticleTypes.RAIN, result.x, result.y, result.z, 1, -1, 1);
 		}
 	}
 }

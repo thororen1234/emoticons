@@ -21,7 +21,7 @@ public class SneezeEmote extends Emote {
 			for (int i = 0; i < 10; i++) {
 				Vector4f result = animator.calcPosition(entity, armature.bones.get("head"), 0, 0.125F, 0.25F, partial);
 
-				entity.world.addParticle(ParticleTypes.CLOUD, result.x, result.y, result.z, this.rand(0.05F), -0.025F,
+				entity.getWorld().addParticle(ParticleTypes.CLOUD, result.x, result.y, result.z, this.rand(0.05F), -0.025F,
 						this.rand(0.05F));
 			}
 		}

@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.util.Identifier;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -32,6 +33,8 @@ public class AnimationMesh {
 	public int normalBuffer;
 	public int texCoordBuffer;
 	public int indexBuffer;
+	public float[] currentVertices;
+	public float[] currentNormals;
 
 	public AnimationMesh(final Animation animation, final String name, final CompiledData compiledData) {
 		this.owner = animation;
@@ -129,6 +132,8 @@ public class AnimationMesh {
 			vector4f2.set(0.0f, 0.0f, 0.0f, 0.0f);
 			vector3f2.set(0.0f, 0.0f, 0.0f);
 		}
+		this.currentVertices = array;
+		this.currentNormals = array2;
 		this.updateVertices(array);
 		this.updateNormals(array2);
 	}
@@ -147,124 +152,43 @@ public class AnimationMesh {
 		GL15.glBufferData(34962, this.normals, 35048);
 	}
 
-	public void render(final MinecraftClient minecraft, final AnimationMeshConfig AnimationMeshConfig) {
+	public void render(final MinecraftClient minecraft, final AnimationMeshConfig AnimationMeshConfig, net.minecraft.client.util.math.MatrixStack matrices, net.minecraft.client.render.VertexConsumerProvider vertexConsumers, int light) {
 		if (AnimationMeshConfig != null && !AnimationMeshConfig.visible) {
 			return;
 		}
 		final Identifier texture = this.getTexture(AnimationMeshConfig);
-		final boolean b = AnimationMeshConfig != null && AnimationMeshConfig.smooth;
-		final boolean b2 = AnimationMeshConfig != null && AnimationMeshConfig.normals;
-		final boolean b3 = AnimationMeshConfig == null || AnimationMeshConfig.lighting;
-		if (texture != null) {
-			GlStateManager.enableTexture();
-			minecraft.getTextureManager().bindTexture(texture);
-			if (AnimationMeshConfig != null) {
-				this.setFiltering(AnimationMeshConfig.filtering);
+		final int color = (AnimationMeshConfig != null) ? AnimationMeshConfig.color : 16777215;
+		float r = (color >> 16 & 0xFF) / 255.0f;
+		float g = (color >> 8 & 0xFF) / 255.0f;
+		float b = (color & 0xFF) / 255.0f;
+		float a = 1.0f;
+
+		net.minecraft.client.render.VertexConsumer consumer = vertexConsumers.getBuffer(net.minecraft.client.render.RenderLayer.getEntityTranslucent(texture != null ? texture : new Identifier("minecraft", "textures/entity/steve.png")));
+
+		net.minecraft.util.math.Matrix4f matrix = matrices.peek().getModel();
+		net.minecraft.util.math.Matrix3f normalMatrix = matrices.peek().getNormal();
+
+		int[] indices = this.data.indexData;
+		float[] uvs = this.data.texData;
+		if (this.currentVertices == null || this.currentNormals == null) return;
+		for (int i = 0; i < indices.length; i += 3) {
+			if (i + 2 >= indices.length) break;
+			for (int j = 0; j < 4; j++) {
+				int index = indices[i + (j == 3 ? 2 : j)];
+				float vw = this.currentVertices[index * 4 + 3];
+				float vx = this.currentVertices[index * 4] / vw;
+				float vy = this.currentVertices[index * 4 + 1] / vw;
+				float vz = this.currentVertices[index * 4 + 2] / vw;
+
+				float nx = this.currentNormals[index * 3];
+				float ny = this.currentNormals[index * 3 + 1];
+				float nz = this.currentNormals[index * 3 + 2];
+
+				float u = uvs[index * 2];
+				float v = uvs[index * 2 + 1];
+
+				consumer.vertex(matrix, vx, vy, vz).color(r, g, b, a).texture(u, v).overlay(net.minecraft.client.render.OverlayTexture.DEFAULT_UV).light(light).normal(normalMatrix, nx, ny, nz).next();
 			}
-		}
-		if (b && b2) {
-			GL11.glShadeModel(7425);
-		}
-		if (!b2) {
-			DiffuseLighting.disable();
-		}
-		if (!b3) {
-			// OpenGlHelper.setLightmapTextureCoords(33985, 240.0f, 240.0f);
-		}
-		final int n = (AnimationMeshConfig != null) ? AnimationMeshConfig.color : 16777215;
-		GlStateManager.color4f((n >> 16 & 0xFF) / 255.0f,  (n >> 8 & 0xFF) / 255.0f,  (n & 0xFF) / 255.0f, 1.0f);
-
-		GlStateManager.enableRescaleNormal();
-		GL15.glBindBuffer(34962, this.vertexBuffer);
-		GL11.glVertexPointer(4, 5126, 0, 0L);
-		GL15.glBindBuffer(34962, this.normalBuffer);
-		GL11.glNormalPointer(5126, 0, 0L);
-		GL15.glBindBuffer(34962, this.texCoordBuffer);
-		GL11.glTexCoordPointer(2, 5126, 0, 0L);
-		GL11.glEnableClientState(32884);
-		GL11.glEnableClientState(32885);
-		GL11.glEnableClientState(32888);
-		GL15.glBindBuffer(34963, this.indexBuffer);
-
-		GlStateManager.disableBlend();
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
-		GlStateManager.alphaFunc(GL11.GL_GREATER, 0.99F);
-		GL11.glDrawElements(4, this.data.indexData.length, 5125, 0L);
-
-		GlStateManager.enableBlend();
-		org.lwjgl.opengl.GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
-		GlStateManager.alphaFunc(GL11.GL_GREATER, 0.3F);
-		GlStateManager.depthMask(false);
-		GL11.glDrawElements(4, this.data.indexData.length, 5125, 0L);
-		GlStateManager.depthMask(true);
-		GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
-
-		GL15.glBindBuffer(34963, 0);
-		GL15.glBindBuffer(34962, 0);
-		GL11.glDisableClientState(32884);
-		GL11.glDisableClientState(32885);
-		GL11.glDisableClientState(32888);
-		if (b && b2) {
-			GL11.glShadeModel(7424);
-		}
-		if (!b2) {
-			DiffuseLighting.enable();
-		}
-		if (!b3) {
-			// OpenGlHelper.setLightmapTextureCoords(33985, prevLightmapS, prevLightmapT);
-		}
-		GlStateManager.disableRescaleNormal();
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(770, 771);
-		if (minecraft.options.debugEnabled && !minecraft.options.reducedDebugInfo) {
-			GlStateManager.disableLighting();
-			GlStateManager.disableDepthTest();
-			GlStateManager.disableTexture();
-			for (final BOBJBone BOBJBone : this.data.mesh.armature.orderedBones) {
-				final Vector4f vec = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
-				final Vector4f vec2 = new Vector4f(0.0f, BOBJBone.length, 0.0f, 1.0f);
-				final Vector4f vec3 = new Vector4f(0.1f, 0.0f, 0.0f, 1.0f);
-				final Vector4f vec4 = new Vector4f(0.0f, 0.1f, 0.0f, 1.0f);
-				final Vector4f vec5 = new Vector4f(0.0f, 0.0f, 0.1f, 1.0f);
-				final Matrix4f boneMatrix = BOBJBone.mat;
-				boneMatrix.transform(vec);
-				boneMatrix.transform(vec2);
-				boneMatrix.transform(vec3);
-				boneMatrix.transform(vec4);
-				boneMatrix.transform(vec5);
-				GL11.glPointSize(5.0f);
-				GL11.glBegin(0);
-				GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-				GL11.glVertex3f(vec.x, vec.y, vec.z);
-				GL11.glEnd();
-				GL11.glLineWidth(1.0f);
-				GL11.glBegin(1);
-				GlStateManager.color4f(0.9f,  0.9f,  0.9f, 1.0f);
-				GL11.glVertex3f(vec.x, vec.y, vec.z);
-				GL11.glVertex3f(vec2.x, vec2.y, vec2.z);
-				GL11.glEnd();
-				GL11.glLineWidth(2.0f);
-				GL11.glBegin(1);
-				GlStateManager.color4f(1.0f,  0.0f,  0.0f, 1.0f);
-				GL11.glVertex3f(vec.x, vec.y, vec.z);
-				GL11.glVertex3f(vec3.x, vec3.y, vec3.z);
-				GL11.glEnd();
-				GL11.glBegin(1);
-				GlStateManager.color4f(0.0f,  1.0f,  0.0f, 1.0f);
-				GL11.glVertex3f(vec.x, vec.y, vec.z);
-				GL11.glVertex3f(vec4.x, vec4.y, vec4.z);
-				GL11.glEnd();
-				GL11.glBegin(1);
-				GlStateManager.color4f(0.0f, 0.0f, 1.0f, 1.0f);
-				GL11.glVertex3f(vec.x, vec.y, vec.z);
-				GL11.glVertex3f(vec5.x, vec5.y, vec5.z);
-				GL11.glEnd();
-			}
-			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
-			GL11.glLineWidth(1.0f);
-			GlStateManager.enableDepthTest();
-			GlStateManager.enableLighting();
-			GlStateManager.enableTexture();
 		}
 	}
 

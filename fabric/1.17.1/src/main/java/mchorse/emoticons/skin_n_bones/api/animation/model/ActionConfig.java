@@ -1,8 +1,8 @@
 package mchorse.emoticons.skin_n_bones.api.animation.model;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.nbt.NbtElement;
 
 public class ActionConfig {
 	public String name = "";
@@ -29,9 +29,9 @@ public class ActionConfig {
 		return config;
 	}
 
-	public void fromNBT(Tag base) {
-		if (base instanceof CompoundTag) {
-			CompoundTag compound = (CompoundTag) base;
+	public void fromNBT(NbtElement base) {
+		if (base instanceof NbtCompound) {
+			NbtCompound compound = (NbtCompound) base;
 			if (compound.contains("Name")) {
 				this.name = compound.getString("Name");
 			}
@@ -50,16 +50,16 @@ public class ActionConfig {
 			if (compound.contains("Tick")) {
 				this.tick = compound.getInt("Tick");
 			}
-		} else if (base instanceof StringTag) {
-			this.name = ((StringTag) base).asString();
+		} else if (base instanceof NbtString) {
+			this.name = ((NbtString) base).asString();
 		}
 	}
 
-	public Tag toNBT() {
+	public NbtElement toNBT() {
 		if (!this.name.isEmpty() && this.isDefault()) {
-			return StringTag.of(this.name);
+			return NbtString.of(this.name);
 		}
-		CompoundTag compound = new CompoundTag();
+		NbtCompound compound = new NbtCompound();
 		if (!this.name.isEmpty()) {
 			compound.putString("Name", this.name);
 		}

@@ -10,13 +10,13 @@ import mchorse.emoticons.skin_n_bones.api.animation.model.ActionPlayback;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.client.EmoteSound;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.Perspective;
+import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.entity.LivingEntity;
 import java.util.*;
 
@@ -181,7 +181,7 @@ public class EmoteController implements ICosmetic {
 		String model = model(entity);
 		if (controller != null && model.equals(controller.animationName))
 			return;
-		controller = new AnimatorEmoticonsController(model, new CompoundTag());
+		controller = new AnimatorEmoticonsController(model, new NbtCompound());
 		controller.fetchAnimation();
 		controller.setEmote(emoteAction);
 	}

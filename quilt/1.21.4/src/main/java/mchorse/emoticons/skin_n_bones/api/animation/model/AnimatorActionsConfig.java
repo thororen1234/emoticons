@@ -2,8 +2,8 @@ package mchorse.emoticons.skin_n_bones.api.animation.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 
 public class AnimatorActionsConfig {
 	public Map<Object, ActionConfig> actions;
@@ -17,10 +17,10 @@ public class AnimatorActionsConfig {
 		this.actions.putAll(config.actions);
 	}
 
-	public void fromNBT(final CompoundTag NbtCompound) {
+	public void fromNBT(final NbtCompound NbtCompound) {
 		this.actions.clear();
 		for (final String s : NbtCompound.getKeys()) {
-			final Tag base = NbtCompound.get(s);
+			final NbtElement base = NbtCompound.get(s);
 			final String key = this.toKey(s);
 			final ActionConfig config = new ActionConfig(key);
 			config.fromNBT(base);
@@ -28,12 +28,12 @@ public class AnimatorActionsConfig {
 		}
 	}
 
-	public CompoundTag toNBT(CompoundTag NbtCompound) {
+	public NbtCompound toNBT(NbtCompound NbtCompound) {
 		if (this.actions.isEmpty()) {
 			return null;
 		}
 		if (NbtCompound == null) {
-			NbtCompound = new CompoundTag();
+			NbtCompound = new NbtCompound();
 		}
 		for (final Map.Entry<Object, ActionConfig> entry : this.actions.entrySet()) {
 			final ActionConfig config = entry.getValue();

@@ -24,7 +24,7 @@ public class DisgustedEmote extends Emote {
 			for (int i = 0; i < 10; i++) {
 				Vector4f result = animator.calcPosition(entity, armature.bones.get("head"), 0, 0.125F, 0.25F, partial);
 
-				entity.world.addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM,
+				entity.getWorld().addParticle(new ItemStackParticleEffect(ParticleTypes.ITEM,
 						new ItemStack(Items.GREEN_DYE)), result.x + this.rand(0.1F), result.y,
 						result.z + this.rand(0.1F), this.rand(0.05F), -0.125F, this.rand(0.05F));
 			}

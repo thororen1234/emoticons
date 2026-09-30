@@ -43,6 +43,7 @@ public class Animator implements IAnimator {
 	public boolean wasOnGround;
 	public boolean wasShooting;
 	public boolean wasConsuming;
+	public float prevHandSwingProgress;
 	public AnimatorController controller;
 
 	public Animator(final AnimatorController controller) {

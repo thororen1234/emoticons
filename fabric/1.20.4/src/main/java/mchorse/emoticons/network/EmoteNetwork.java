@@ -74,11 +74,11 @@ public final class EmoteNetwork {
 			this.player = player; this.key = key;
 			int[] definition = EmoteCatalog.get(key);
 			duration = definition[0]; looping = definition[1] != 0;
-			x = player.getX(); y = player.getY(); z = player.getZ(); world = player.world;
+			x = player.getX(); y = player.getY(); z = player.getZ(); world = player.getWorld();
 		}
 		boolean expired() {
 			double dx = player.getX() - x, dy = player.getY() - y, dz = player.getZ() - z;
-			return !player.isAlive() || player.world != world || player.isSleeping()
+			return !player.isAlive() || player.getWorld() != world || player.isSleeping()
 					|| dx * dx + dy * dy + dz * dz > 0.01 || (!looping && age >= duration);
 		}
 	}

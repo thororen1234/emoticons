@@ -13,7 +13,7 @@ import mchorse.emoticons.common.EmoteAPI;
 import mchorse.emoticons.common.emotes.Emote;
 import mchorse.emoticons.common.emotes.Emotes;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -125,7 +125,7 @@ public class KeyboardHandler {
 			MinecraftClient mc = MinecraftClient.getInstance();
 			if (mc.currentScreen == null) {
 				try {
-					mc.openScreen(new GuiEmotes());
+					mc.setScreen(new GuiEmotes());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

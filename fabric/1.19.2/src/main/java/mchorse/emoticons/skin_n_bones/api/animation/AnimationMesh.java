@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.util.Identifier;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -156,8 +157,8 @@ public class AnimationMesh {
 		final boolean b2 = AnimationMeshConfig != null && AnimationMeshConfig.normals;
 		final boolean b3 = AnimationMeshConfig == null || AnimationMeshConfig.lighting;
 		if (texture != null) {
-			GlStateManager.enableTexture();
-			minecraft.getTextureManager().bindTexture(texture);
+// enableTexture
+			RenderSystem.setShaderTexture(0, texture);
 			if (AnimationMeshConfig != null) {
 				this.setFiltering(AnimationMeshConfig.filtering);
 			}
@@ -166,15 +167,13 @@ public class AnimationMesh {
 			GL11.glShadeModel(7425);
 		}
 		if (!b2) {
-			DiffuseLighting.disable();
+			DiffuseLighting.disableGuiDepthLighting();
 		}
 		if (!b3) {
 			// OpenGlHelper.setLightmapTextureCoords(33985, 240.0f, 240.0f);
 		}
 		final int n = (AnimationMeshConfig != null) ? AnimationMeshConfig.color : 16777215;
-		GlStateManager.color4f((n >> 16 & 0xFF) / 255.0f,  (n >> 8 & 0xFF) / 255.0f,  (n & 0xFF) / 255.0f, 1.0f);
-
-		GlStateManager.enableRescaleNormal();
+		RenderSystem.setShaderColor((n >> 16 & 0xFF) / 255.0f, (n >> 8 & 0xFF) / 255.0f, (n & 0xFF) / 255.0f, 1.0f);
 		GL15.glBindBuffer(34962, this.vertexBuffer);
 		GL11.glVertexPointer(4, 5126, 0, 0L);
 		GL15.glBindBuffer(34962, this.normalBuffer);
@@ -186,18 +185,14 @@ public class AnimationMesh {
 		GL11.glEnableClientState(32888);
 		GL15.glBindBuffer(34963, this.indexBuffer);
 
-		GlStateManager.disableBlend();
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
-		GlStateManager.alphaFunc(GL11.GL_GREATER, 0.99F);
+		RenderSystem.disableBlend();
 		GL11.glDrawElements(4, this.data.indexData.length, 5125, 0L);
 
-		GlStateManager.enableBlend();
+		RenderSystem.enableBlend();
 		org.lwjgl.opengl.GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
-		GlStateManager.alphaFunc(GL11.GL_GREATER, 0.3F);
-		GlStateManager.depthMask(false);
+		RenderSystem.depthMask(false);
 		GL11.glDrawElements(4, this.data.indexData.length, 5125, 0L);
-		GlStateManager.depthMask(true);
-		GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+		RenderSystem.depthMask(true);
 
 		GL15.glBindBuffer(34963, 0);
 		GL15.glBindBuffer(34962, 0);
@@ -208,18 +203,16 @@ public class AnimationMesh {
 			GL11.glShadeModel(7424);
 		}
 		if (!b2) {
-			DiffuseLighting.enable();
+			DiffuseLighting.enableGuiDepthLighting();
 		}
 		if (!b3) {
 			// OpenGlHelper.setLightmapTextureCoords(33985, prevLightmapS, prevLightmapT);
 		}
-		GlStateManager.disableRescaleNormal();
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(770, 771);
+		RenderSystem.enableBlend();
+		RenderSystem.defaultBlendFunc();
 		if (minecraft.options.debugEnabled && !minecraft.options.reducedDebugInfo) {
-			GlStateManager.disableLighting();
-			GlStateManager.disableDepthTest();
-			GlStateManager.disableTexture();
+			RenderSystem.disableDepthTest();
+// disableTexture
 			for (final BOBJBone BOBJBone : this.data.mesh.armature.orderedBones) {
 				final Vector4f vec = new Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
 				final Vector4f vec2 = new Vector4f(0.0f, BOBJBone.length, 0.0f, 1.0f);
@@ -234,37 +227,30 @@ public class AnimationMesh {
 				boneMatrix.transform(vec5);
 				GL11.glPointSize(5.0f);
 				GL11.glBegin(0);
-				GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 				GL11.glVertex3f(vec.x, vec.y, vec.z);
 				GL11.glEnd();
 				GL11.glLineWidth(1.0f);
 				GL11.glBegin(1);
-				GlStateManager.color4f(0.9f,  0.9f,  0.9f, 1.0f);
 				GL11.glVertex3f(vec.x, vec.y, vec.z);
 				GL11.glVertex3f(vec2.x, vec2.y, vec2.z);
 				GL11.glEnd();
 				GL11.glLineWidth(2.0f);
 				GL11.glBegin(1);
-				GlStateManager.color4f(1.0f,  0.0f,  0.0f, 1.0f);
 				GL11.glVertex3f(vec.x, vec.y, vec.z);
 				GL11.glVertex3f(vec3.x, vec3.y, vec3.z);
 				GL11.glEnd();
 				GL11.glBegin(1);
-				GlStateManager.color4f(0.0f,  1.0f,  0.0f, 1.0f);
 				GL11.glVertex3f(vec.x, vec.y, vec.z);
 				GL11.glVertex3f(vec4.x, vec4.y, vec4.z);
 				GL11.glEnd();
 				GL11.glBegin(1);
-				GlStateManager.color4f(0.0f, 0.0f, 1.0f, 1.0f);
 				GL11.glVertex3f(vec.x, vec.y, vec.z);
 				GL11.glVertex3f(vec5.x, vec5.y, vec5.z);
 				GL11.glEnd();
 			}
-			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
 			GL11.glLineWidth(1.0f);
-			GlStateManager.enableDepthTest();
-			GlStateManager.enableLighting();
-			GlStateManager.enableTexture();
+			RenderSystem.enableDepthTest();
+// enableTexture
 		}
 	}
 

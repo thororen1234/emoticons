@@ -5,9 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -22,7 +22,7 @@ public class RLUtils {
 		}
 		final ResourceManager resourceManager = MinecraftClient.getInstance()
 				.getResourceManager();
-		return resourceManager.getResource(multi.children.get(0));
+		return resourceManager.getResource(multi.children.get(0)).orElse(null);
 	}
 
 	public static Identifier create(String string) {
@@ -39,9 +39,9 @@ public class RLUtils {
 		return new Identifier(s, s2);
 	}
 
-	public static Identifier create(final Tag element) {
-		if (element instanceof ListTag) {
-			final ListTag tagList = (ListTag) element;
+	public static Identifier create(final NbtElement element) {
+		if (element instanceof NbtList) {
+			final NbtList tagList = (NbtList) element;
 			if (!tagList.isEmpty()) {
 				final MultiResourceLocation multi = new MultiResourceLocation(tagList.getString(0));
 				for (int i = 1; i < tagList.size(); ++i) {
@@ -49,8 +49,8 @@ public class RLUtils {
 				}
 				return multi;
 			}
-		} else if (element instanceof StringTag) {
-			return create(((StringTag) element).asString());
+		} else if (element instanceof NbtString) {
+			return create(((NbtString) element).asString());
 		}
 		return null;
 	}
@@ -75,19 +75,19 @@ public class RLUtils {
 		return null;
 	}
 
-	public static Tag writeNbt(final Identifier location) {
+	public static NbtElement writeNbt(final Identifier location) {
 		if (location instanceof MultiResourceLocation) {
 			final MultiResourceLocation multi = (MultiResourceLocation) location;
-			final ListTag tagList = new ListTag();
+			final NbtList tagList = new NbtList();
 			final Iterator<?> iterator = multi.children.iterator();
 			while (iterator.hasNext()) {
 				tagList.add(
-						StringTag.of(((Identifier) iterator.next()).toString()));
+						NbtString.of(((Identifier) iterator.next()).toString()));
 			}
 			return tagList;
 		}
 		if (location != null) {
-			return StringTag.of(location.toString());
+			return NbtString.of(location.toString());
 		}
 		return null;
 	}

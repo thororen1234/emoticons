@@ -12,7 +12,7 @@ import net.minecraft.sound.SoundEvent;
 public final class EmoteSound extends MovingSoundInstance {
 	private final LivingEntity player;
 	private EmoteSound(LivingEntity player, Emote emote) {
-		super(new SoundEvent(new Identifier("emoticons", emote.key)), SoundCategory.PLAYERS);
+		super(SoundEvent.of(new Identifier("emoticons", emote.key)), SoundCategory.PLAYERS, net.minecraft.client.sound.SoundInstance.createRandom());
 		this.player = player;
 		repeat = emote.looping;
 		pitch = Math.max(0, Math.min(1, ClientConfig.instance.volume));

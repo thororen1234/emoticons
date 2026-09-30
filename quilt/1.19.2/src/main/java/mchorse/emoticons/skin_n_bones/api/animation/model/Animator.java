@@ -43,6 +43,7 @@ public class Animator implements IAnimator {
 	public boolean wasOnGround;
 	public boolean wasShooting;
 	public boolean wasConsuming;
+	public float prevHandSwingProgress;
 	public AnimatorController controller;
 
 	public Animator(final AnimatorController controller) {
@@ -115,7 +116,7 @@ public class Animator implements IAnimator {
 
 	protected void controlActions(LivingEntity target) {
 		double dx = target.getX() - prevX, dz = target.getZ() - prevZ;
-		boolean flying = target instanceof PlayerEntity && ((PlayerEntity) target).abilities.flying;
+		boolean flying = target instanceof PlayerEntity && ((PlayerEntity) target).getAbilities().flying;
 		boolean wet = target.isTouchingWater();
 		float threshold = flying ? 0.1F : wet ? 0.025F : 0.01F;
 		boolean moves = Math.abs(dx) > threshold || Math.abs(dz) > threshold;
@@ -154,7 +155,8 @@ public class Animator implements IAnimator {
 		if (shooting && !wasShooting && shoot != null) shoot.fade();
 		if (consuming && !wasConsuming && consume != null) consume.fade();
 		if (target.hurtTime == 9) addAction(hurt);
-		if (target.handSwingProgress == 0.0F && !target.isSleeping()) addAction(swipe);
+		if (prevHandSwingProgress == 0.0F && target.handSwingProgress > 0.0F && !target.isSleeping()) addAction(swipe);
+		prevHandSwingProgress = target.handSwingProgress;
 		prevX = target.getX(); prevZ = target.getZ(); prevMY = target.getVelocity().y;
 		wasOnGround = target.isOnGround();
 	}

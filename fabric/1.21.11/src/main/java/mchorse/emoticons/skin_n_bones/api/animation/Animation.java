@@ -56,7 +56,7 @@ public class Animation {
 			final AnimationMesh AnimationMesh = new AnimationMesh(this, entry.getKey(),
 					(CompiledData) entry.getValue());
 
-			AnimationMesh.texture = new Identifier("minecraft", "textures/entity/steve.png");
+			AnimationMesh.texture = Identifier.of("minecraft", "textures/entity/steve.png");
 			this.meshes.add(AnimationMesh);
 		}
 	}

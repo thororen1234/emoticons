@@ -1,7 +1,7 @@
 package mchorse.emoticons.skin_n_bones.api.animation.model;
 
 import mchorse.mclib.utils.Interpolation;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 public class AnimatorHeldItemConfig {
 	public String boneName = "";
@@ -57,7 +57,7 @@ public class AnimatorHeldItemConfig {
 		return super.equals(object);
 	}
 
-	public void fromNBT(CompoundTag compound) {
+	public void fromNBT(NbtCompound compound) {
 		if (compound.contains("X")) {
 			this.x = compound.getFloat("X");
 		}
@@ -87,9 +87,9 @@ public class AnimatorHeldItemConfig {
 		}
 	}
 
-	public CompoundTag toNBT(CompoundTag compound) {
+	public NbtCompound toNBT(NbtCompound compound) {
 		if (compound == null) {
-			compound = new CompoundTag();
+			compound = new NbtCompound();
 		}
 		if (this.x != 0.0f) {
 			compound.putFloat("X", this.x);

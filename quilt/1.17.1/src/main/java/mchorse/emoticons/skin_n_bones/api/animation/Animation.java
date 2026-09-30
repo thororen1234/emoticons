@@ -68,11 +68,9 @@ public class Animation {
 		this.meshes.clear();
 	}
 
-	public void render(final Map<?, ?> map) {
+	public void render(final Map<?, ?> map, net.minecraft.client.util.math.MatrixStack matrices, net.minecraft.client.render.VertexConsumerProvider vertexConsumers, int light) {
 		for (final AnimationMesh AnimationMesh : this.meshes) {
-			AnimationMesh.render(this.mc, (map == null) ? null : ((AnimationMeshConfig) map.get(AnimationMesh.name)));
+			AnimationMesh.render(this.mc, (map == null) ? null : ((AnimationMeshConfig) map.get(AnimationMesh.name)), matrices, vertexConsumers, light);
 		}
-		GL15.glBindBuffer(34962, 0);
-		GL15.glBindBuffer(34963, 0);
 	}
 }

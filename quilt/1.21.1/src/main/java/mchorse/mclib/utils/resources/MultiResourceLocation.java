@@ -5,21 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.util.Identifier;
 
-public class MultiResourceLocation
-		extends Identifier {
+public class MultiResourceLocation {
 	public List<Identifier> children = new ArrayList<>();
 
 	public MultiResourceLocation(String string) {
-		super("it_would_be_very_ironic:if_this_would_match_with_regular_rls");
 		this.children.add(RLUtils.create(string));
 	}
 
 	public MultiResourceLocation(String string, String string2) {
-		super("it_would_be_very_ironic", "if_this_would_match_with_regular_rls");
 		this.children.add(RLUtils.create(string, string2));
 	}
 
-	public String getResourceDomain() {
+	public String getNamespace() {
 		return this.children.isEmpty() ? "" : this.children.get(0).getNamespace();
 	}
 
@@ -51,7 +48,7 @@ public class MultiResourceLocation
 		int n = super.hashCode();
 		int n2 = this.children.size();
 		for (int i = 0; i < n2; ++i) {
-			n = 31 * n + this.children.hashCode();
+			n = 31 * n + this.children.get(i).hashCode();
 		}
 		return n;
 	}

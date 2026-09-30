@@ -2,7 +2,7 @@ package mchorse.emoticons.skin_n_bones.api.animation;
 
 import mchorse.mclib.utils.resources.RLUtils;
 import net.minecraft.util.Identifier;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 
 public class AnimationMeshConfig {
 	public Identifier texture;
@@ -25,7 +25,7 @@ public class AnimationMeshConfig {
 		return config;
 	}
 
-	public void fromNBT(CompoundTag compound) {
+	public void fromNBT(NbtCompound compound) {
 		if (compound.contains("Texture")) {
 			this.texture = RLUtils.create(compound.get("Texture"));
 		}
@@ -49,9 +49,9 @@ public class AnimationMeshConfig {
 		}
 	}
 
-	public CompoundTag toNBT(CompoundTag compound) {
+	public NbtCompound toNBT(NbtCompound compound) {
 		if (compound == null) {
-			compound = new CompoundTag();
+			compound = new NbtCompound();
 		}
 		if (this.texture != null) {
 			compound.put("Texture", RLUtils.writeNbt(this.texture));

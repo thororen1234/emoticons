@@ -11,14 +11,14 @@ import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.entity.vehicle.AbstractMinecartEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.client.util.math.Vector3f;
-import net.minecraft.util.math.Quaternion;
+
+import org.joml.Quaternionf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
@@ -49,12 +49,12 @@ public class AnimatorController {
 	public long lastModified;
 	public int checkConfig;
 	public String animationName;
-	public CompoundTag userData;
+	public NbtCompound userData;
 	private final MinecraftClient mc;
 	private final Vector4f result;
 	private final Matrix4f rotate;
 
-	public AnimatorController(String name, CompoundTag data) {
+	public AnimatorController(String name, NbtCompound data) {
 		this.factory = DEFAULT_FACTORY;
 		this.userConfig = new AnimatorConfig();
 		this.result = new Vector4f();
@@ -90,7 +90,7 @@ public class AnimatorController {
 		}
 	}
 
-	public void refresh(String key, CompoundTag compound) {
+	public void refresh(String key, NbtCompound compound) {
 		this.animation = null;
 		this.animator = null;
 		this.animationName = key;
@@ -102,11 +102,7 @@ public class AnimatorController {
 		this.fetchAnimation();
 
 		if (this.animation != null && this.animation.meshes.size() > 0) {
-
-			GlStateManager.enableRescaleNormal();
-			GL11.glEnable(GL11.GL_ALPHA_TEST);
-			GlStateManager.enableDepthTest();
-			GlStateManager.color4f(1.0f, 1.0f, 1.0f, 1.0f);
+			RenderSystem.enableDepthTest();
 
 			float guiScale = this.userConfig.scaleGui;
 			GL11.glPushMatrix();
@@ -115,26 +111,24 @@ public class AnimatorController {
 
 			float prevYawHead = player.headYaw;
 			float prevPrevYawHead = player.prevHeadYaw;
-			float lastPitch = player.pitch;
-			float prevPrevPitch = player.prevPitch;
+			float lastPitch = player.getPitch(1.0f);
+			float prevPrevPitch = player.getPitch(0.0f);
 
 			player.prevHeadYaw = 0.0f;
 			player.headYaw = 0.0f;
-			player.prevPitch = 0.0f;
-			player.pitch = 0.0f;
+			player.setPitch(0.0f);
+			player.setPitch(0.0f);
 
 			this.renderAnimation(player, matrices, vertexConsumers, light, this.animation.meshes.get(0), 0.0f, 0.0f);
 
 			player.headYaw = prevYawHead;
 			player.prevHeadYaw = prevPrevYawHead;
-			player.pitch = lastPitch;
-			player.prevPitch = prevPrevPitch;
+			player.setPitch(lastPitch);
+			player.setPitch(prevPrevPitch);
 
 			GL11.glPopMatrix();
-			GlStateManager.disableDepthTest();
-			GL11.glDisable(GL11.GL_ALPHA_TEST);
-			DiffuseLighting.disable();
-			GlStateManager.disableRescaleNormal();
+			RenderSystem.disableDepthTest();
+			DiffuseLighting.disableGuiDepthLighting();
 		}
 	}
 
@@ -146,8 +140,7 @@ public class AnimatorController {
 	public void render(LivingEntity livingBase, MatrixStack matrices, VertexConsumerProvider vertexConsumers,
 			int light, float entityYaw, float partialTicks) {
 		if (this.animation != null && this.animation.meshes.size() > 0) {
-			GlStateManager.disableCull();
-			GL11.glEnable(GL11.GL_ALPHA_TEST);
+			RenderSystem.disableCull();
 
 			float yaw = livingBase.prevBodyYaw + (livingBase.bodyYaw - livingBase.prevBodyYaw) * partialTicks;
 
@@ -171,15 +164,15 @@ public class AnimatorController {
 			matrices.scale(scale, scale, scale);
 
 			if (livingBase.isSleeping()) {
-				matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(270.0f));
+				matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(270.0f));
 			} else {
-				matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0f - (yaw - 180.0f)));
+				matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(180.0f - (yaw - 180.0f)));
 			}
 
 			this.renderAnimation(livingBase, matrices, vertexConsumers, light, this.animation.meshes.get(0), yaw,
 					partialTicks);
 			matrices.pop();
-			GlStateManager.enableCull();
+			RenderSystem.enableCull();
 		}
 	}
 
@@ -203,20 +196,18 @@ public class AnimatorController {
 		 * exactly what vanilla does for its own unbatched passes, e.g.
 		 * ParticleManager#renderParticles.
 		 */
-		RenderSystem.pushMatrix();
-		RenderSystem.multMatrix(matrices.peek().getModel());
-		GlStateManager.enableDepthTest();
-		GlStateManager.depthMask(true);
-		GlStateManager.enableRescaleNormal();
-		DiffuseLighting.enable();
+		GL11.glPushMatrix();
+		this.setupMatrix(matrices);
+		RenderSystem.enableDepthTest();
+		RenderSystem.depthMask(true);
+		DiffuseLighting.enableGuiDepthLighting();
 		boolean lit = RenderLightmap.set(livingBase, partialTicks);
 		this.animation.render(this.userConfig.meshes);
 		if (lit) {
 			RenderLightmap.unset();
 		}
-		DiffuseLighting.disable();
-		GlStateManager.disableRescaleNormal();
-		RenderSystem.popMatrix();
+		DiffuseLighting.disableGuiDepthLighting();
+		GL11.glPopMatrix();
 
 		/* Items go through the new pipeline, so they use the MatrixStack directly. */
 		this.renderItems(livingBase, matrices, vertexConsumers, light, armature);
@@ -241,7 +232,7 @@ public class AnimatorController {
 
 		if (head != null) {
 			float yawHead = livingBase.prevHeadYaw + (livingBase.headYaw - livingBase.prevHeadYaw) * partialTicks;
-			float pitch = livingBase.prevPitch + (livingBase.pitch - livingBase.prevPitch) * partialTicks;
+			float pitch = livingBase.getPitch(0.0f) + (livingBase.getPitch(1.0f) - livingBase.getPitch(0.0f)) * partialTicks;
 
 			yawHead = (yaw - yawHead) / 180.0f * (float) Math.PI;
 
@@ -265,16 +256,15 @@ public class AnimatorController {
 				matrices.push();
 				applyBoneMatrix(matrices, head.mat);
 				matrices.translate(0.0f, 0.25f, 0.0f);
-				matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
+				matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
 				matrices.scale(0.625f, 0.625f, 0.625f);
 				/*
 				 * 1.15: ItemRenderer#renderHeldItem(ItemStack, LivingEntity, Type, boolean) is
 				 * now renderItem(LivingEntity, ItemStack, Mode, boolean, MatrixStack,
 				 * VertexConsumerProvider, World, light, overlay), and
-				 * ModelTransformation.Type was renamed to ModelTransformation.Mode.
+				 * ModelTransformation.Type was renamed to net.minecraft.client.render.model.json.ModelTransformationMode.
 				 */
-				this.mc.getItemRenderer().renderItem(entity, stack, ModelTransformation.Mode.HEAD, false, matrices,
-						vertexConsumers, entity.world, light, OverlayTexture.DEFAULT_UV);
+				this.mc.getItemRenderer().renderItem(entity, stack, net.minecraft.client.render.model.json.ModelTransformationMode.HEAD, false, matrices, vertexConsumers, entity.getWorld(), light, OverlayTexture.DEFAULT_UV, entity.getId());
 				matrices.pop();
 			}
 		}
@@ -307,11 +297,10 @@ public class AnimatorController {
 			applyBoneMatrix(matrices, bone.mat);
 			matrices.translate(config.x, config.y, config.z);
 			matrices.scale(scale * config.scaleX, scale * config.scaleY, scale * config.scaleZ);
-			matrices.multiply(Vector3f.POSITIVE_X.getDegreesQuaternion(config.rotateX));
-			matrices.multiply(Vector3f.POSITIVE_Y.getDegreesQuaternion(config.rotateY));
-			matrices.multiply(Vector3f.POSITIVE_Z.getDegreesQuaternion(config.rotateZ));
-			mc.getItemRenderer().renderItem(livingBase, stack, ModelTransformation.Mode.THIRD_PERSON_RIGHT_HAND, false,
-					matrices, vertexConsumers, livingBase.world, light, OverlayTexture.DEFAULT_UV);
+			matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_X.rotationDegrees(config.rotateX));
+			matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(config.rotateY));
+			matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Z.rotationDegrees(config.rotateZ));
+			mc.getItemRenderer().renderItem(livingBase, stack, net.minecraft.client.render.model.json.ModelTransformationMode.THIRD_PERSON_RIGHT_HAND, false, matrices, vertexConsumers, livingBase.getWorld(), light, OverlayTexture.DEFAULT_UV, livingBase.getId());
 		} finally {
 			matrices.pop();
 		}
@@ -332,38 +321,17 @@ public class AnimatorController {
 		float scale = matrix.getScale();
 
 		matrices.translate(translation.x, translation.y, translation.z);
-		matrices.multiply(new Quaternion(rotation.x, rotation.y, rotation.z, rotation.w));
+		matrices.multiply(new Quaternionf(rotation.x, rotation.y, rotation.z, rotation.w));
 		matrices.scale(scale, scale, scale);
 	}
 
-	public void setupMatrix(BOBJBone bone) {
-		this.setupMatrix(bone.mat);
-	}
 
-	public void setupMatrix(Matrix4f matrix) {
-		MATRIX_ARRAY[0] = matrix.m00;
-		MATRIX_ARRAY[1] = matrix.m10;
-		MATRIX_ARRAY[2] = matrix.m20;
-		MATRIX_ARRAY[3] = matrix.m30;
-		MATRIX_ARRAY[4] = matrix.m01;
-		MATRIX_ARRAY[5] = matrix.m11;
-		MATRIX_ARRAY[6] = matrix.m21;
-		MATRIX_ARRAY[7] = matrix.m31;
-		MATRIX_ARRAY[8] = matrix.m02;
-		MATRIX_ARRAY[9] = matrix.m12;
-		MATRIX_ARRAY[10] = matrix.m22;
-		MATRIX_ARRAY[11] = matrix.m32;
-		MATRIX_ARRAY[12] = matrix.m03;
-		MATRIX_ARRAY[13] = matrix.m13;
-		MATRIX_ARRAY[14] = matrix.m23;
-		MATRIX_ARRAY[15] = matrix.m33;
-
+	public void setupMatrix(MatrixStack matrices) {
 		MATRIX_BUFFER.clear();
-		MATRIX_BUFFER.put(MATRIX_ARRAY);
+		matrices.peek().getPositionMatrix().get(MATRIX_BUFFER);
 		MATRIX_BUFFER.flip();
 		GL11.glMultMatrixf(MATRIX_BUFFER);
 	}
-
 	public void update(LivingEntity entity) {
 		this.fetchAnimation();
 

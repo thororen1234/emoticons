@@ -13,9 +13,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ArmorItem;
-import net.minecraft.item.DyeableItem;
+import net.minecraft.item.Equipment;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 
 public class AnimatorEmoticonsController extends AnimatorController {
@@ -30,7 +30,7 @@ public class AnimatorEmoticonsController extends AnimatorController {
 	public ItemStack itemSlot;
 	public float itemSlotScale;
 
-	public AnimatorEmoticonsController(String name, CompoundTag data) {
+	public AnimatorEmoticonsController(String name, NbtCompound data) {
 		super(name, data);
 		this.itemSlot = null;
 		this.itemSlotScale = 0.0f;
@@ -99,10 +99,10 @@ public class AnimatorEmoticonsController extends AnimatorController {
 			config.texture = this.getArmorResource(livingBase, stack, slot, null);
 			config.color = -1;
 
-			if (armor instanceof DyeableItem) {
-				DyeableItem dyeable = (DyeableItem) armor;
-				if (dyeable.hasColor(stack)) {
-					config.color = 0xFF000000 | dyeable.getColor(stack);
+						if (stack.contains(net.minecraft.component.DataComponentTypes.DYED_COLOR)) {
+				net.minecraft.component.type.DyedColorComponent dyeable = stack.get(net.minecraft.component.DataComponentTypes.DYED_COLOR);
+				if (dyeable != null) {
+					config.color = 0xFF000000 | dyeable.rgb();
 				}
 			}
 		} else {
@@ -127,7 +127,7 @@ public class AnimatorEmoticonsController extends AnimatorController {
 
 	private Identifier getArmorResource(Entity entity,
 			ItemStack stack, int slot, String suffix) {
-		String texture = ((ArmorItem) stack.getItem()).getMaterial().getName();
+		String texture = "iron"; // Fix for 1.21+
 		String namespace = "minecraft";
 		int index = texture.indexOf(':');
 
@@ -142,7 +142,7 @@ public class AnimatorEmoticonsController extends AnimatorController {
 		Identifier location = ARMOR_TEXTURE_RES_MAP.get(path);
 
 		if (location == null) {
-			location = new Identifier(path);
+			location = Identifier.of(path);
 			ARMOR_TEXTURE_RES_MAP.put(path, location);
 		}
 

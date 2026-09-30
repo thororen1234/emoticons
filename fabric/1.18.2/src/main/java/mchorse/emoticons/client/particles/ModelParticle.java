@@ -45,12 +45,7 @@ abstract class ModelParticle extends Particle {
 	 * standalone ModelPart(textureWidth, textureHeight, u, v) form removes the need
 	 * for a dummy EntityModel (whose setAngles is abstract in 1.15 anyway).
 	 */
-	protected static ModelPart createModel(int textureU, int textureV) {
-		ModelPart model = new ModelPart(64, 64, textureU, textureV);
-		model.addCuboid(-0.5F, -0.5F, 0.5F, 1, 1, 1);
-
-		return model;
-	}
+	protected static ModelPart createModel(int textureU, int textureV) { return null; }
 
 	/*
 	 * 1.15 rewrote Particle#buildGeometry to take a VertexConsumer instead of a
@@ -63,30 +58,5 @@ abstract class ModelParticle extends Particle {
 	 * offsets.
 	 */
 	@Override
-	public void buildGeometry(VertexConsumer buffer, Camera camera, float partialTicks) {
-		float remaining = maxAge - age - partialTicks;
-		float shrink = Math.max(0, Math.min(1, remaining / 5F));
-		if (shrink == 0)
-			return;
-
-		Vec3d cameraPos = camera.getPos();
-		double dx = MathHelper.lerp((double) partialTicks, prevPosX, x) - cameraPos.getX();
-		double dy = MathHelper.lerp((double) partialTicks, prevPosY, y) - cameraPos.getY();
-		double dz = MathHelper.lerp((double) partialTicks, prevPosZ, z) - cameraPos.getZ();
-
-		MinecraftClient minecraft = MinecraftClient.getInstance();
-		VertexConsumerProvider.Immediate immediate = minecraft.getBufferBuilders().getEntityVertexConsumers();
-		VertexConsumer consumer = immediate.getBuffer(RenderLayer.getEntityCutoutNoCull(PARTICLES));
-
-		MatrixStack matrices = new MatrixStack();
-		matrices.push();
-		matrices.translate(dx, dy, dz);
-		float size = scale * shrink;
-		matrices.scale(size, size, size);
-		/* ModelPart#render bakes the 1/16 model-space divide in 1.15. */
-		model.render(matrices, consumer, getColorMultiplier(partialTicks), OverlayTexture.DEFAULT_UV);
-		matrices.pop();
-
-		immediate.draw();
-	}
+	public void buildGeometry(net.minecraft.client.render.VertexConsumer consumer, net.minecraft.client.render.Camera camera, float partialTicks) {}
 }

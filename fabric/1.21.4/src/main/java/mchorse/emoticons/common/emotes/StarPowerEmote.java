@@ -22,7 +22,7 @@ public class StarPowerEmote extends Emote {
 			Vector4f result = animator.calcPosition(entity, hand, 0, 0.15F, 0, partial);
 
 			for (int i = 0, c = 15; i < c; i++) {
-				entity.world.addParticle(ParticleTypes.END_ROD, result.x, result.y, result.z,
+				entity.getWorld().addParticle(ParticleTypes.END_ROD, result.x, result.y, result.z,
 						this.rand.nextGaussian() * 0.05, -this.rand.nextDouble() * 0.05,
 						this.rand.nextGaussian() * 0.05);
 			}
@@ -56,7 +56,7 @@ public class StarPowerEmote extends Emote {
 			}
 
 			for (int i = 0, c = 7; i < c; i++) {
-				entity.world.addParticle(ParticleTypes.ENTITY_EFFECT, result.x + this.rand.nextDouble() * 0.05 - 0.025,
+				entity.getWorld().addParticle(ParticleTypes.HAPPY_VILLAGER, result.x + this.rand.nextDouble() * 0.05 - 0.025,
 						result.y - 0.1, result.z + this.rand.nextDouble() * 0.05 - 0.025, r, g, b);
 			}
 		}

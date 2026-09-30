@@ -10,13 +10,13 @@ import mchorse.emoticons.skin_n_bones.api.animation.model.ActionPlayback;
 import mchorse.emoticons.skin_n_bones.api.bobj.BOBJArmature;
 import mchorse.emoticons.client.EmoteSound;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.Perspective;
+import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.entity.LivingEntity;
 import java.util.*;
 
@@ -166,7 +166,7 @@ public class EmoteController implements ICosmetic {
 	}
 
 	private String model(LivingEntity entity) {
-		String skin = entity instanceof AbstractClientPlayerEntity ? ((AbstractClientPlayerEntity) entity).getModel() : "default";
+		String skin = entity instanceof AbstractClientPlayerEntity ? ((AbstractClientPlayerEntity) entity).getSkinTextures().model().getName() : "default";
 		String style = ClientConfig.instance.model;
 		if ("3d".equals(style))
 			return skin + "_3d";
@@ -181,7 +181,7 @@ public class EmoteController implements ICosmetic {
 		String model = model(entity);
 		if (controller != null && model.equals(controller.animationName))
 			return;
-		controller = new AnimatorEmoticonsController(model, new CompoundTag());
+		controller = new AnimatorEmoticonsController(model, new NbtCompound());
 		controller.fetchAnimation();
 		controller.setEmote(emoteAction);
 	}
@@ -192,7 +192,7 @@ public class EmoteController implements ICosmetic {
 		if (controller.animation == null || controller.animation.meshes.isEmpty())
 			return false;
 		if (entity instanceof AbstractClientPlayerEntity && controller.userConfig.meshes.containsKey("body")) {
-			controller.userConfig.meshes.get("body").texture = ((AbstractClientPlayerEntity) entity).getSkinTexture();
+			controller.userConfig.meshes.get("body").texture = ((AbstractClientPlayerEntity) entity).getSkinTextures().texture();
 		}
 		controller.render(entity, matrices, vertexConsumers, light, yaw, delta);
 		// Emit effects at most once per simulation tick, regardless of frame rate or
