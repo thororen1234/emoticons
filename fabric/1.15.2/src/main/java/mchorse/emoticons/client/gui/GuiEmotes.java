@@ -264,7 +264,7 @@ public class GuiEmotes extends Screen {
 		GlStateManager.enableRescaleNormal();
 		GlStateManager.enableColorMaterial();
 		VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
-		this.controller.renderOnScreen(mc.player, new MatrixStack(), vertexConsumers, 0xF000F0,
+		this.controller.renderOnScreen(mc.player, matrices, vertexConsumers, 0xF000F0,
 				0, 0, 1.0f, partialTicks);
 		vertexConsumers.draw();
 		GlStateManager.disableRescaleNormal();
@@ -384,12 +384,23 @@ public class GuiEmotes extends Screen {
 		selectedIndex = -1;
 	}
 
+	private Emote previewEmote;
+	private int previewTimer;
+
 	private void playPreview(String key) {
 		if (this.controller == null || this.controller.animation == null || this.controller.config == null) return;
 		try {
 			ActionConfig actionConfig = this.controller.config.config.actions.getConfig("emote_" + key);
 			if (actionConfig != null) {
 				this.controller.setEmote(this.controller.animation.createAction(null, actionConfig, true));
+				if (this.previewEmote != null) {
+					this.previewEmote.stopAnimation(this.controller);
+				}
+				this.previewEmote = Emotes.EMOTES.get(key);
+				this.previewTimer = 0;
+				if (this.previewEmote != null) {
+					this.previewEmote.startAnimation(this.controller);
+				}
 			}
 		} catch (Exception e) { /* preview not critical */ }
 	}

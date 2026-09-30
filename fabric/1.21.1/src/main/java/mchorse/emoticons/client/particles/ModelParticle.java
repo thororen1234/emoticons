@@ -45,18 +45,35 @@ abstract class ModelParticle extends Particle {
 	 * standalone ModelPart(textureWidth, textureHeight, u, v) form removes the need
 	 * for a dummy EntityModel (whose setAngles is abstract in 1.15 anyway).
 	 */
-	protected static ModelPart createModel(int textureU, int textureV) { return null; }
+	protected static ModelPart createModel(int textureU, int textureV) {
+		java.util.List<ModelPart.Cuboid> cuboids = new java.util.ArrayList<>();
+		cuboids.add(new ModelPart.Cuboid(textureU, textureV, -0.5F, -0.5F, 0.5F, 1.0F, 1.0F, 1.0F, 0.0F, 0.0F, 0.0F, false, 64.0F, 64.0F));
+		return new ModelPart(cuboids, java.util.Collections.emptyMap());
+	}
 
-	/*
-	 * 1.15 rewrote Particle#buildGeometry to take a VertexConsumer instead of a
-	 * BufferBuilder plus the five pre-baked billboard rotation factors, and the
-	 * static Particle.cameraX/Y/Z fields are gone (the Camera carries the position
-	 * now). ParticleTextureSheet.CUSTOM is still an unbatched pass, so this draws
-	 * its own geometry through the entity vertex consumers instead of the supplied
-	 * buffer. The particle manager has already pushed the camera matrix onto the
-	 * GL modelview stack, so the local MatrixStack only carries camera-relative
-	 * offsets.
-	 */
 	@Override
-	public void buildGeometry(net.minecraft.client.render.VertexConsumer consumer, net.minecraft.client.render.Camera camera, float partialTicks) {}
+	public void buildGeometry(VertexConsumer buffer, Camera camera, float partialTicks) {
+		float remaining = maxAge - age - partialTicks;
+		float shrink = Math.max(0, Math.min(1, remaining / 5F));
+		if (shrink == 0) return;
+
+		Vec3d cameraPos = camera.getPos();
+		double dx = MathHelper.lerp((double) partialTicks, prevPosX, x) - cameraPos.getX();
+		double dy = MathHelper.lerp((double) partialTicks, prevPosY, y) - cameraPos.getY();
+		double dz = MathHelper.lerp((double) partialTicks, prevPosZ, z) - cameraPos.getZ();
+
+		MinecraftClient minecraft = MinecraftClient.getInstance();
+		VertexConsumerProvider.Immediate immediate = minecraft.getBufferBuilders().getEntityVertexConsumers();
+		VertexConsumer consumer = immediate.getBuffer(RenderLayer.getEntityCutoutNoCull(PARTICLES));
+
+		MatrixStack matrices = new MatrixStack();
+		matrices.push();
+		matrices.translate(dx, dy, dz);
+		float size = scale * shrink;
+		matrices.scale(size, size, size);
+		model.render(matrices, consumer, getBrightness(partialTicks), OverlayTexture.DEFAULT_UV);
+		matrices.pop();
+
+		immediate.draw();
+	}
 }

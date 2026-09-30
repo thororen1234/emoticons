@@ -161,6 +161,11 @@ public class AnimatorController {
 
 			float scale = this.userConfig.scale;
 			matrices.push();
+			
+			if (livingBase.isSneaking() && !livingBase.isSleeping() && !livingBase.hasVehicle()) {
+				matrices.translate(0.0, 0.125, 0.0);
+			}
+			
 			matrices.scale(scale, scale, scale);
 
 			if (livingBase.isSleeping()) {
