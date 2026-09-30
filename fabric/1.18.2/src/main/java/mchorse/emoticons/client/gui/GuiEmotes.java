@@ -271,10 +271,12 @@ public class GuiEmotes extends Screen {
 		matrices.push();
 		matrices.translate(x,  y,  100.0f);
 		matrices.scale(-scale,  scale,  scale);
+		matrices.multiply(net.minecraft.util.math.Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
 		matrices.multiply(net.minecraft.util.math.Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0f));
 		matrices.multiply(net.minecraft.util.math.Vec3f.POSITIVE_Y.getDegreesQuaternion(previewRotation));
 		DiffuseLighting.enableGuiDepthLighting();
-						VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
+						com.mojang.blaze3d.systems.RenderSystem.disableCull();
+		VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
 		this.controller.renderOnScreen(mc.player, matrices, vertexConsumers, 0xF000F0,
 				0, 0, 1.0f, partialTicks);
 		vertexConsumers.draw();
@@ -372,7 +374,7 @@ public class GuiEmotes extends Screen {
 	}
 
 	@Override
-	public boolean shouldPause() {
+	public boolean isPauseScreen() {
 		return false;
 	}
 

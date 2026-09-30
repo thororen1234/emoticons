@@ -60,7 +60,7 @@ public class GuiEmotes extends Screen {
 	private int lastMouseX = 0;
 
 	public GuiEmotes() {
-		super(net.minecraft.text.Text.literal(""));
+		super(new LiteralText(""));
 		MinecraftClient mc = MinecraftClient.getInstance();
 		this.keys = ClientProxy.keys;
 
@@ -103,7 +103,7 @@ public class GuiEmotes extends Screen {
 		this.settingButtons.clear();
 		
 
-		this.addDrawableChild(new ClickableWidget(LIST_WIDTH + 5, PLAY_Y, 60, 20, net.minecraft.text.Text.literal("Play")) {
+		this.addDrawableChild(new ClickableWidget(LIST_WIDTH + 5, PLAY_Y, 60, 20, new LiteralText("Play")) {
 			@Override
 			public void onClick(double mouseX, double mouseY) {
 				super.onClick(mouseX, mouseY);
@@ -111,9 +111,9 @@ public class GuiEmotes extends Screen {
 			}
 
 			@Override
-			public void appendClickableNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
+			public void appendNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
 		});
-		this.addDrawableChild(new ClickableWidget(LIST_WIDTH + 70, PLAY_Y, 60, 20, net.minecraft.text.Text.literal("Stop")) {
+		this.addDrawableChild(new ClickableWidget(LIST_WIDTH + 70, PLAY_Y, 60, 20, new LiteralText("Stop")) {
 			@Override
 			public void onClick(double mouseX, double mouseY) {
 				super.onClick(mouseX, mouseY);
@@ -121,7 +121,7 @@ public class GuiEmotes extends Screen {
 			}
 
 			@Override
-			public void appendClickableNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
+			public void appendNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
 		});
 
 		int setX = LIST_WIDTH + 5;
@@ -137,14 +137,14 @@ public class GuiEmotes extends Screen {
 		for (int i = 0; i < 6; i++) {
 			final int index = i;
 			int setW = setTotal > available ? Math.max(20, available * setWidths[i] / setTotal) : setWidths[i];
-			ClickableWidget setBtn = new ClickableWidget(setX, SETTINGS_Y, setW, BTN_HEIGHT, net.minecraft.text.Text.literal(settingLabel(i))) {
+			ClickableWidget setBtn = new ClickableWidget(setX, SETTINGS_Y, setW, BTN_HEIGHT, new LiteralText(settingLabel(i))) {
 				@Override
 				public void onClick(double mouseX, double mouseY) {
 					super.onClick(mouseX, mouseY);
 					toggleSetting(index);
 				}
 				@Override
-				public void appendClickableNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
+				public void appendNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
 			};
 
 			this.settingButtons.add(setBtn);
@@ -159,14 +159,14 @@ public class GuiEmotes extends Screen {
 			String emoteName = this.keys.emotes.get(i);
 			String label = (i + 1) + ": " + formatEmoteName(emoteName);
 			int btnX = LIST_WIDTH + 5 + i * (btnW + 5);
-			ClickableWidget btn = new ClickableWidget(btnX, btnY, btnW, BTN_HEIGHT, net.minecraft.text.Text.literal(label)) {
+			ClickableWidget btn = new ClickableWidget(btnX, btnY, btnW, BTN_HEIGHT, new LiteralText(label)) {
 				@Override
 				public void onClick(double mouseX, double mouseY) {
 					super.onClick(mouseX, mouseY);
 					handleButtonClick(this);
 				}
 				@Override
-				public void appendClickableNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
+				public void appendNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
 			};
 			this.slotButtons.add(btn);
 			this.addDrawableChild(btn);
@@ -271,10 +271,12 @@ public class GuiEmotes extends Screen {
 		matrices.push();
 		matrices.translate(x,  y,  100.0f);
 		matrices.scale(-scale,  scale,  scale);
-		matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
-		matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(previewRotation));
+		matrices.multiply(net.minecraft.util.math.Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
+		matrices.multiply(net.minecraft.util.math.Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0f));
+		matrices.multiply(net.minecraft.util.math.Vec3f.POSITIVE_Y.getDegreesQuaternion(previewRotation));
 		DiffuseLighting.enableGuiDepthLighting();
-						VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
+						com.mojang.blaze3d.systems.RenderSystem.disableCull();
+		VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
 		this.controller.renderOnScreen(mc.player, matrices, vertexConsumers, 0xF000F0,
 				0, 0, 1.0f, partialTicks);
 		vertexConsumers.draw();
@@ -372,7 +374,7 @@ public class GuiEmotes extends Screen {
 	}
 
 	@Override
-	public boolean shouldPause() {
+	public boolean isPauseScreen() {
 		return false;
 	}
 
@@ -417,7 +419,7 @@ public class GuiEmotes extends Screen {
 
 	private void updateSlotButton(int idx) {
 		if (idx < slotButtons.size()) {
-			slotButtons.get(idx).setMessage(net.minecraft.text.Text.literal((idx + 1) + ": " + formatEmoteName(this.keys.emotes.get(idx))));
+			slotButtons.get(idx).setMessage(new LiteralText((idx + 1) + ": " + formatEmoteName(this.keys.emotes.get(idx))));
 		}
 	}
 
@@ -477,7 +479,7 @@ public class GuiEmotes extends Screen {
 		}
 
 		if (index < settingButtons.size()) {
-			settingButtons.get(index).setMessage(net.minecraft.text.Text.literal(settingLabel(index)));
+			settingButtons.get(index).setMessage(new LiteralText(settingLabel(index)));
 		}
 	}
 

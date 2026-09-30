@@ -12,7 +12,7 @@ import mchorse.emoticons.common.emotes.Emote;
 import mchorse.emoticons.common.emotes.Emotes;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.screen.Screen;
@@ -26,7 +26,7 @@ import java.util.List;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.Identifier;
 
 public class GuiEmotes extends Screen {
@@ -60,7 +60,7 @@ public class GuiEmotes extends Screen {
 	private int lastMouseX = 0;
 
 	public GuiEmotes() {
-		super(net.minecraft.text.Text.literal(""));
+		super(new LiteralText(""));
 		MinecraftClient mc = MinecraftClient.getInstance();
 		this.keys = ClientProxy.keys;
 
@@ -103,10 +103,26 @@ public class GuiEmotes extends Screen {
 		this.settingButtons.clear();
 		
 
-		this.addDrawableChild(net.minecraft.client.gui.widget.ButtonWidget.builder(net.minecraft.text.Text.literal("Play"), b -> { handleButtonClick(b);
-			 }).dimensions(LIST_WIDTH + 5, PLAY_Y, 60, 20).build());
-		this.addDrawableChild(net.minecraft.client.gui.widget.ButtonWidget.builder(net.minecraft.text.Text.literal("Stop"), b -> { handleButtonClick(b);
-			 }).dimensions(LIST_WIDTH + 70, PLAY_Y, 60, 20).build());
+		this.addDrawableChild(new ClickableWidget(LIST_WIDTH + 5, PLAY_Y, 60, 20, new LiteralText("Play")) {
+			@Override
+			public void onClick(double mouseX, double mouseY) {
+				super.onClick(mouseX, mouseY);
+				handleButtonClick(this);
+			}
+
+			@Override
+			public void appendNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
+		});
+		this.addDrawableChild(new ClickableWidget(LIST_WIDTH + 70, PLAY_Y, 60, 20, new LiteralText("Stop")) {
+			@Override
+			public void onClick(double mouseX, double mouseY) {
+				super.onClick(mouseX, mouseY);
+				handleButtonClick(this);
+			}
+
+			@Override
+			public void appendNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
+		});
 
 		int setX = LIST_WIDTH + 5;
 		int available = this.width - LIST_WIDTH - 10 - 5 * 5;
@@ -121,8 +137,15 @@ public class GuiEmotes extends Screen {
 		for (int i = 0; i < 6; i++) {
 			final int index = i;
 			int setW = setTotal > available ? Math.max(20, available * setWidths[i] / setTotal) : setWidths[i];
-			ClickableWidget setBtn = net.minecraft.client.gui.widget.ButtonWidget.builder(net.minecraft.text.Text.literal(settingLabel(i)), b -> { toggleSetting(index);
-				 }).dimensions(setX, SETTINGS_Y, setW, BTN_HEIGHT).build();
+			ClickableWidget setBtn = new ClickableWidget(setX, SETTINGS_Y, setW, BTN_HEIGHT, new LiteralText(settingLabel(i))) {
+				@Override
+				public void onClick(double mouseX, double mouseY) {
+					super.onClick(mouseX, mouseY);
+					toggleSetting(index);
+				}
+				@Override
+				public void appendNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
+			};
 
 			this.settingButtons.add(setBtn);
 			this.addDrawableChild(setBtn);
@@ -136,8 +159,15 @@ public class GuiEmotes extends Screen {
 			String emoteName = this.keys.emotes.get(i);
 			String label = (i + 1) + ": " + formatEmoteName(emoteName);
 			int btnX = LIST_WIDTH + 5 + i * (btnW + 5);
-			ClickableWidget btn = net.minecraft.client.gui.widget.ButtonWidget.builder(net.minecraft.text.Text.literal(label), b -> { handleButtonClick(b);
-				 }).dimensions(btnX, btnY, btnW, BTN_HEIGHT).build();
+			ClickableWidget btn = new ClickableWidget(btnX, btnY, btnW, BTN_HEIGHT, new LiteralText(label)) {
+				@Override
+				public void onClick(double mouseX, double mouseY) {
+					super.onClick(mouseX, mouseY);
+					handleButtonClick(this);
+				}
+				@Override
+				public void appendNarrations(net.minecraft.client.gui.screen.narration.NarrationMessageBuilder builder) {}
+			};
 			this.slotButtons.add(btn);
 			this.addDrawableChild(btn);
 		}
@@ -159,8 +189,8 @@ public class GuiEmotes extends Screen {
 	}
 
 	@Override
-	public void render(net.minecraft.client.gui.DrawContext context, int mouseX, int mouseY, float partialTicks) {
-		this.renderBackground(context);
+	public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+		this.renderBackground(matrices);
 
 		MinecraftClient mc = MinecraftClient.getInstance();
 		int listH = this.height - BOTTOM_HEIGHT - 32;
@@ -169,12 +199,12 @@ public class GuiEmotes extends Screen {
 		int startY = 32;
 
 		// Left panel
-		context.fill( 0, 0, LIST_WIDTH, this.height, 0xCC000000);
-		context.drawTextWithShadow(this.textRenderer, "Search:", 5, 5, 0xAAAAAA);
-		context.fill( 5, 15, LIST_WIDTH - 5, 29, 0xFF555555);
-		context.fill( 6, 16, LIST_WIDTH - 6, 28, 0xFF222222);
+		DrawableHelper.fill(matrices, 0, 0, LIST_WIDTH, this.height, 0xCC000000);
+		this.textRenderer.drawWithShadow(matrices, "Search:", 5, 5, 0xAAAAAA);
+		DrawableHelper.fill(matrices, 5, 15, LIST_WIDTH - 5, 29, 0xFF555555);
+		DrawableHelper.fill(matrices, 6, 16, LIST_WIDTH - 6, 28, 0xFF222222);
 		String displaySearch = searchText + (searchFocused ? "_" : "");
-		context.drawTextWithShadow(this.textRenderer, displaySearch, 8, 18, 0xFFFFFF);
+		this.textRenderer.drawWithShadow(matrices, displaySearch, 8, 18, 0xFFFFFF);
 
 		for (int i = 0; i < visibleRows; i++) {
 			int idx = i + scrollOffset;
@@ -183,19 +213,19 @@ public class GuiEmotes extends Screen {
 			boolean isSelected = (idx == selectedIndex);
 			boolean isHovered = mouseX < LIST_WIDTH && mouseY >= startY + i * rowH && mouseY < startY + (i + 1) * rowH;
 			int bg = isSelected ? 0xFF4444AA : (isHovered ? 0xFF333355 : 0x00000000);
-			if (bg != 0) context.fill( 0, startY + i * rowH, LIST_WIDTH, startY + (i + 1) * rowH, bg);
-			context.drawTextWithShadow(this.textRenderer, formatEmoteName(key), 5, startY + i * rowH + 2, isSelected ? 0xFFFFFF : 0xCCCCCC);
+			if (bg != 0) DrawableHelper.fill(matrices, 0, startY + i * rowH, LIST_WIDTH, startY + (i + 1) * rowH, bg);
+			this.textRenderer.drawWithShadow(matrices, formatEmoteName(key), 5, startY + i * rowH + 2, isSelected ? 0xFFFFFF : 0xCCCCCC);
 		}
 
 		if (filteredKeys.size() > visibleRows) {
 			int scrollH = Math.max(10, (int) ((float) visibleRows / filteredKeys.size() * listH));
 			int scrollY = startY + (int) ((float) scrollOffset / Math.max(1, filteredKeys.size() - visibleRows) * (listH - scrollH));
-			context.fill( LIST_WIDTH - 4, scrollY, LIST_WIDTH - 1, scrollY + scrollH, 0xFF888888);
+			DrawableHelper.fill(matrices, LIST_WIDTH - 4, scrollY, LIST_WIDTH - 1, scrollY + scrollH, 0xFF888888);
 		}
 
 		// Bottom bar
-		context.fillGradient( LIST_WIDTH, this.height - BOTTOM_HEIGHT - 20, this.width, this.height - BOTTOM_HEIGHT, 0x00000000, 0x88000000);
-		context.fill( LIST_WIDTH, this.height - BOTTOM_HEIGHT, this.width, this.height, 0x99000000);
+		this.fillGradient(matrices, LIST_WIDTH, this.height - BOTTOM_HEIGHT - 20, this.width, this.height - BOTTOM_HEIGHT, 0x00000000, 0x88000000);
+		DrawableHelper.fill(matrices, LIST_WIDTH, this.height - BOTTOM_HEIGHT, this.width, this.height, 0x99000000);
 
 		// Model preview
 		if (this.controller != null && this.controller.animation != null) {
@@ -207,7 +237,7 @@ public class GuiEmotes extends Screen {
 				lastMouseX = mouseX;
 			}
 
-			drawModel(context, mc, previewX, previewY, 50, partialTicks);
+			drawModel(mc, previewX, previewY, 50, partialTicks);
 		}
 
 		// Emote name overlay
@@ -215,40 +245,42 @@ public class GuiEmotes extends Screen {
 			String name = formatEmoteName(filteredKeys.get(selectedIndex));
 			int cx = LIST_WIDTH + (this.width - LIST_WIDTH) / 2;
 			int nameW = this.textRenderer.getWidth(name);
-			context.getMatrices().push();
-			context.getMatrices().translate(cx - nameW,  this.height - BOTTOM_HEIGHT - 32,  0);
-			context.getMatrices().scale(2.0f,  2.0f,  2.0f);
-			context.drawTextWithShadow(this.textRenderer, name, 0, 0, 0xFFFFFF);
-			context.getMatrices().pop();
+			matrices.push();
+			matrices.translate(cx - nameW,  this.height - BOTTOM_HEIGHT - 32,  0);
+			matrices.scale(2.0f,  2.0f,  2.0f);
+			this.textRenderer.drawWithShadow(matrices, name, 0, 0, 0xFFFFFF);
+			matrices.pop();
 		}
 
 		// Title bar
-		context.fillGradient( LIST_WIDTH, 0, this.width, 32, 0x88000000, 0x00000000);
+		this.fillGradient(matrices, LIST_WIDTH, 0, this.width, 32, 0x88000000, 0x00000000);
 		String title = "Emotes ";
 		String subtitle = "(" + Emotes.EMOTES.size() + " total)";
-		context.drawTextWithShadow(this.textRenderer, title, LIST_WIDTH + 5, 10, 0xFFFFFF);
-		context.drawTextWithShadow(this.textRenderer, subtitle, LIST_WIDTH + 5 + this.textRenderer.getWidth(title), 10, 0xAAAAAA);
+		this.textRenderer.drawWithShadow(matrices, title, LIST_WIDTH + 5, 10, 0xFFFFFF);
+		this.textRenderer.drawWithShadow(matrices, subtitle, LIST_WIDTH + 5 + this.textRenderer.getWidth(title), 10, 0xAAAAAA);
 
 		// Slot label
-		context.drawTextWithShadow(this.textRenderer, "Editing slot: " + (slotIndex + 1), LIST_WIDTH + 5, this.height - BOTTOM_HEIGHT + 5, 0xAAAAAA);
+		this.textRenderer.drawWithShadow(matrices, "Editing slot: " + (slotIndex + 1), LIST_WIDTH + 5, this.height - BOTTOM_HEIGHT + 5, 0xAAAAAA);
 
-		super.render(context, mouseX, mouseY, partialTicks);
+		super.render(matrices, mouseX, mouseY, partialTicks);
 	}
 
-	private void drawModel(DrawContext context, MinecraftClient mc, int x, int y, int scale, float partialTicks) {
-		MatrixStack matrices = context.getMatrices();
+	private void drawModel(MinecraftClient mc, int x, int y, int scale, float partialTicks) {
+		MatrixStack matrices = new MatrixStack();
 		RenderSystem.enableDepthTest();
-		context.getMatrices().push();
-		context.getMatrices().translate(x,  y,  100.0f);
-		context.getMatrices().scale(-scale,  scale,  scale);
-		matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Z.rotationDegrees(180.0f));
-		matrices.multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Y.rotationDegrees(previewRotation));
+		matrices.push();
+		matrices.translate(x,  y,  100.0f);
+		matrices.scale(-scale,  scale,  scale);
+		matrices.multiply(net.minecraft.util.math.Vec3f.POSITIVE_Y.getDegreesQuaternion(180.0f));
+		matrices.multiply(net.minecraft.util.math.Vec3f.POSITIVE_Z.getDegreesQuaternion(180.0f));
+		matrices.multiply(net.minecraft.util.math.Vec3f.POSITIVE_Y.getDegreesQuaternion(previewRotation));
 		DiffuseLighting.enableGuiDepthLighting();
-						VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
+						com.mojang.blaze3d.systems.RenderSystem.disableCull();
+		VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
 		this.controller.renderOnScreen(mc.player, matrices, vertexConsumers, 0xF000F0,
 				0, 0, 1.0f, partialTicks);
 		vertexConsumers.draw();
-				context.getMatrices().pop();
+				matrices.pop();
 		DiffuseLighting.disableGuiDepthLighting();
 		RenderSystem.disableDepthTest();
 	}
@@ -342,7 +374,7 @@ public class GuiEmotes extends Screen {
 	}
 
 	@Override
-	public boolean shouldPause() {
+	public boolean isPauseScreen() {
 		return false;
 	}
 
@@ -387,7 +419,7 @@ public class GuiEmotes extends Screen {
 
 	private void updateSlotButton(int idx) {
 		if (idx < slotButtons.size()) {
-			slotButtons.get(idx).setMessage(net.minecraft.text.Text.literal((idx + 1) + ": " + formatEmoteName(this.keys.emotes.get(idx))));
+			slotButtons.get(idx).setMessage(new LiteralText((idx + 1) + ": " + formatEmoteName(this.keys.emotes.get(idx))));
 		}
 	}
 
@@ -447,7 +479,7 @@ public class GuiEmotes extends Screen {
 		}
 
 		if (index < settingButtons.size()) {
-			settingButtons.get(index).setMessage(net.minecraft.text.Text.literal(settingLabel(index)));
+			settingButtons.get(index).setMessage(new LiteralText(settingLabel(index)));
 		}
 	}
 

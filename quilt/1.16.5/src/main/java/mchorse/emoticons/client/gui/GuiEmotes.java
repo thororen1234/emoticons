@@ -239,6 +239,7 @@ public class GuiEmotes extends Screen {
 		DiffuseLighting.enable();
 		GlStateManager.enableRescaleNormal();
 		GlStateManager.enableColorMaterial();
+		com.mojang.blaze3d.systems.RenderSystem.disableCull();
 		VertexConsumerProvider.Immediate vertexConsumers = mc.getBufferBuilders().getEntityVertexConsumers();
 		this.controller.renderOnScreen(mc.player, matrices, vertexConsumers, 0xF000F0,
 				0, 0, 1.0f, partialTicks);
